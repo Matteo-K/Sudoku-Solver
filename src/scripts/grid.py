@@ -1,6 +1,6 @@
 import math
 
-from typing import Iterable, List, BinaryIO, TextIO
+from typing import List, BinaryIO, TextIO
 
 
 class GridParseResult:
@@ -48,9 +48,7 @@ def grid_print(grid: List[List[int]], txtFile: TextIO):
     padding = int(math.log10(size)) + 1
 
     def print_separation_row():
-        for _ in range(n):
-            print(f'+{"-" * size}', end='')
-        print("+")
+        print((n * (padding + 2) * '-').join(['+' for _ in range(n + 1)]))
 
     print_separation_row()
     for i, row in enumerate(grid):
@@ -68,11 +66,11 @@ def grid_encode(grid: List[List[int]], binFile: BinaryIO):
     """Writes the grid to stdout in binary format."""
     for row in grid:
         for value in row:
-            binFile.write(value.to_bytes(4, byteorder='little', signed=True))
+            binFile.write(value.to_bytes(4, byteorder='little', signed=False))
 
 
 def grid_decode(n: int, binFile: BinaryIO) -> List[List[int]]:
-    """Reads a grid of size n²*n² from binFile in binary format."""
+    """Reads a grid of size n⁴ from binFile in binary format."""
     grid = []
     for _ in range(n * n):
         row = []

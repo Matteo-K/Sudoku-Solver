@@ -21,7 +21,7 @@ if ! compgen -G "*.c" > /dev/null; then
 fi
 
 # Run program
-$file_exe <<< $file_grid
+$file_exe < $file_grid
 
 # Run gcov
 dir_out=$dir_out/gcov_${str_gridName}_$(date +'%H-%M-%S')

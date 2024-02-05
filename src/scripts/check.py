@@ -3,7 +3,7 @@
 import sys
 from typing import Iterable
 
-from grid import grid_parse
+from grid import grid_decode, grid_print
 
 
 def chain(*iterables: Iterable) -> Iterable:
@@ -20,7 +20,7 @@ def grid_get_errors(grid: tuple[tuple[int]], N: int) -> list[str]:
         columnCounts = map(lambda row: len(row), grid)
         if rowCount == SIZE and all(map(lambda count: count == SIZE, columnCounts)):
             return None
-        return (f"Grid has invalid size ({rowCount} rows and {set(columnCounts) or 0} columns)",)
+        return (f'Grid has invalid size ({rowCount} rows and {set(columnCounts) or 0} columns)',)
 
     def get_blocks():
         for blockRow in range(0, SIZE, N):
@@ -54,25 +54,24 @@ def grid_get_errors(grid: tuple[tuple[int]], N: int) -> list[str]:
             msgParts.append(f'duplicate {duplicates}')
 
         return f'{slicePosition}: {", ".join(msgParts)}'
-
     return get_grid_size_error() or map(lambda gridSlice: get_error(*gridSlice), chain(
-        ((row, f"row {i+1}") for i, row in enumerate(grid)),
-        ((column, f"column {i+1}")
+        ((row, f'row {i+1}') for i, row in enumerate(grid)),
+        ((column, f'column {i+1}')
          for i, column in enumerate(zip(*grid))),
         get_blocks()))
 
 
 def printUsage():
-    print(f"Usage : {sys.argv[0]} <N>")
+    print(f'Usage : {sys.argv[0]} <N>')
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 
     if len(sys.argv) not in (2, 3):
         printUsage()
         exit(1)
 
-    quiet = len(sys.argv) == 3 and 'q' in sys.argv[1]
+    quiet = '-q' in sys.argv
 
     try:
         n = int(sys.argv[2 if len(sys.argv) == 3 else 1])
@@ -80,13 +79,13 @@ if __name__ == "__main__":
         printUsage()
         exit(1)
 
-    gridParseResult = grid_parse(sys.stdin)
+    grid = grid_decode(n, sys.stdin.buffer)
     if not quiet:
-        print(gridParseResult.text, end="")
+        grid_print(grid, n)
 
-    errors = list(filter(None, grid_get_errors(gridParseResult.grid, n)))
+    errors = list(filter(None, grid_get_errors(grid, n)))
     if errors:
-        print("\n".join(errors))
-        print(f"This Sudoku grid is not valid ({len(errors)} errors).")
+        print('\n'.join(errors))
+        print(f'This Sudoku grid is not valid ({len(errors)} errors).')
     else:
-        print("This Sudoku grid is valid.")
+        print('This Sudoku grid is valid.')

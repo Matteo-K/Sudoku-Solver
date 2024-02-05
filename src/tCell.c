@@ -1,7 +1,6 @@
 /** @file
- * @brief Implémentation des fonctions de manipulation des cases
+ * @brief Cell functions implementation
  * @author 5cover, Matteo-K
- * @date 16/01/2024
  */
 
 #include <assert.h>
@@ -9,17 +8,18 @@
 #include <stdio.h>
 
 #include "const.h"
-#include "tTile.h"
+#include "tCell.h"
 
-int tile_candidateAt(tTile const *tile, int n)
+int cell_candidateAt(tCell const *cell, int n)
 {
+    assert(n <= SIZE);
     assert(1 <= n && n <= SIZE);
 
     int candidate = 0;
 
     while (n > 0 && candidate <= SIZE) {
         candidate++;
-        n -= tile->hasCandidate[candidate];
+        n -= cell->hasCandidate[candidate];
     }
 
     return candidate > SIZE ? 0 : candidate;

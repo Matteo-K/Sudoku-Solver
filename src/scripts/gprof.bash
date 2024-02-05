@@ -15,7 +15,7 @@ dir_out=$(realpath -m $4)
 pushd $(dirname $file_exe)
 
 # Run program
-$file_exe <<< $file_grid
+$file_exe < $file_grid
 
 # Run gprof
 mkdir -p $dir_out
