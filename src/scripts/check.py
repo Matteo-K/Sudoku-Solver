@@ -66,7 +66,6 @@ def printUsage():
 
 
 if __name__ == '__main__':
-
     if len(sys.argv) not in (2, 3):
         printUsage()
         exit(1)

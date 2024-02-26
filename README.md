@@ -8,7 +8,7 @@ Created by [Matteo-K](https://github.com/Matteo-K) and [Scover](https://github.c
 
 `sudosolve [OPTION]... [N:integer]`
 
-$N$ represents the grid size factor (usually 3 for regular Sudoku grids that have 9 rows and columns). Must be in range $[1 ; 65535]$.
+$N$ represents the grid size factor (usually 3 for regular Sudoku grids that have 9 rows and columns). Must be in range $[1 ; `INT_MAX_`]$.
 
 The grid is read from standard input.
 
@@ -18,8 +18,8 @@ The solved grid is printed to standard ouptut in the Sud format.
 
 Option|Description
 -|-
-`-s`, `--see`|Don't solve the grid before printing it (default is to solve the grid)
-`-h`, `--human`|Print the grid in a human-readable format (default is Sud format)
+`-s`|**See** the grid: Don't solve the grid before printing it (default is to solve the grid)
+`-h`|Print the grid in a **human-readable** format (default is Sud format)
 
 ### Examples
 

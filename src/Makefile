@@ -31,11 +31,11 @@ $(file_exe_release): $(dir_bin) $(files_sources) $(files_headers)
 
 # Simple run
 run: $(file_exe_release)
-	$(file_exe_release) < $(file_grid)
+	$(file_exe_release) -h < $(file_grid)
 
 # Debug run
 debug: $(file_exe_debug)
-	$(file_exe_debug) < $(file_grid)
+	$(file_exe_debug) -h < $(file_grid)
 
 # Grid testing run
 test: $(file_exe_release)

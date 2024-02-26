@@ -7,14 +7,25 @@
 #define TYPES_H
 
 #include <stdbool.h>
+#include <stdint.h>
 
 #include "const.h"
+
+/// @brief Type of a grid value.
+/// @remark Range : [0; @ref N]
+typedef uint_least8_t tValue;
+/// @brief Type of a grid index.
+/// @remark Range : [0; @ref SIZE]
+typedef uint_least8_t tIndex;
+/// @brief Type of a grid value count.
+/// @remark Range : [0; @ref SIZE]
+typedef uint_least8_t tCount;
 
 /// @brief A cell of a Sudoku grid
 typedef struct {
     /// @brief Value of the cell.
     /// @remark In range [1 ; @ref SIZE]
-    int _value;
+    tValue _value;
 
     /// @brief Boolean array representing for each candidate whether it is present or not.
     /// @remark The first case of the array, at index 0 is unused. This is to allow direct indexation with the candidate value.
@@ -25,8 +36,8 @@ typedef struct {
     int _candidateCount;
 } tCell;
 
-/// @brief Square matrix of integers of side @ref SIZE representing a Sudoku grid's values
-typedef int tIntegerGrid[SIZE][SIZE];
+/// @brief Square matrix of 32-bit integers of side @ref SIZE representing a Sud file.
+typedef uint32_t tInt32Grid[SIZE][SIZE];
 
 /// @brief A Sudoku grid
 typedef struct {
@@ -51,10 +62,10 @@ typedef struct {
 typedef struct {
     /// @brief Row index.
     /// @remark In range [0 ; @ref SIZE - 1]
-    int row;
+    tIndex row;
     /// @brief Column index.
     /// @remark In range [0 ; @ref SIZE - 1]
-    int column;
+    tIndex column;
 } tPosition;
 
 /// @brief An array of a maximum of @ref SIZE * @ref SIZE positions on the grid
@@ -63,14 +74,14 @@ typedef tPosition tPositionArray[SIZE * SIZE];
 /// @brief Pair of 2 identical candidates with their positions.
 typedef struct {
     /// @brief Candidates
-    int candidates[PAIR_SIZE];
+    tValue candidates[PAIR_SIZE];
     /// @brief Count of candidates
     /// @remark In range [0 ; @ref PAIR_SIZE]
-    int count;
+    tCount count;
 } tPair2;
 
 /// @brief Integer array representing the number of occurences for each candidate.
 /// @remark The first case of the array, at index 0 is unused. This is to allow direct indexation with the candidate value.
-typedef int tCandidateCounts[SIZE + 1];
+typedef tCount tCandidateCounts[SIZE + 1];
 
 #endif // TYPES_H

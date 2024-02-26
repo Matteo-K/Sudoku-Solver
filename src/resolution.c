@@ -17,8 +17,8 @@ bool perform_simpleTechniques(tGrid *grid)
     bool progress = false;
     tCell *cell;
 
-    for (int r = 0; r < SIZE; r++) {
-        for (int c = 0; c < SIZE; c++) {
+    for (tIndex r = 0; r < SIZE; r++) {
+        for (tIndex c = 0; c < SIZE; c++) {
             // Executing the techniques in order of increasing complexity.
             // As soon as the value of the cell is defined, we move on to the next one.
 
@@ -43,7 +43,7 @@ bool perform_simpleTechniques(tGrid *grid)
     return progress;
 }
 
-bool technique_backtracking(tGrid *grid, tPositionArray emptyCellPositions, int emptyCellCount, int iCellPosition)
+bool technique_backtracking(tGrid *grid, tPositionArray emptyCellPositions, tCount emptyCellCount, tIndex iCellPosition)
 {
     // This technique does not use candidates but value presence arrays.
     // The reason is that synchronizing the candidates between recursive calls requires loops.
@@ -54,14 +54,14 @@ bool technique_backtracking(tGrid *grid, tPositionArray emptyCellPositions, int 
         return true;
     }
 
-    assert(0 <= iCellPosition && iCellPosition < emptyCellCount);
+    assert(iCellPosition < emptyCellCount);
 
     // Select the cell to solve
     technique_backtracking_swap_cells(grid, emptyCellPositions, emptyCellCount, iCellPosition);
 
     tPosition pos = emptyCellPositions[iCellPosition];
 
-    for (int value = 1; value <= SIZE; value++) {
+    for (tValue value = 1; value <= SIZE; value++) {
         if (POSSIBLE(grid, pos.row, pos.column, value)) {
             // assuming that the cell contains this value,
             GRID_MARK_VALUE_FREE(grid, pos.row, pos.column, value, false);
@@ -82,16 +82,16 @@ bool technique_backtracking(tGrid *grid, tPositionArray emptyCellPositions, int 
     return false;
 }
 
-void technique_backtracking_swap_cells(tGrid const *grid, tPositionArray emptyCellPositions, int emptyCellCount, int iHere)
+void technique_backtracking_swap_cells(tGrid const *grid, tPositionArray emptyCellPositions, tCount emptyCellCount, tIndex iHere)
 {
-    assert(0 <= iHere && iHere < emptyCellCount);
+    assert(iHere < emptyCellCount);
 
     tPosition pos = emptyCellPositions[iHere];
-    int iMin = iHere;
+    tIndex iMin = iHere;
     GRID_CELL_POSSIBLE_VALUES_COUNT(grid, pos.row, pos.column, possibleValCountMin);
 
     // find the cell after which has the least possible values
-    for (int i = iHere + 1; i < emptyCellCount; i++) {
+    for (tIndex i = iHere + 1; i < emptyCellCount; i++) {
         pos = emptyCellPositions[i];
         GRID_CELL_POSSIBLE_VALUES_COUNT(grid, pos.row, pos.column, possibleValCountI);
 
@@ -107,7 +107,7 @@ void technique_backtracking_swap_cells(tGrid const *grid, tPositionArray emptyCe
     emptyCellPositions[iMin] = tmp;
 }
 
-bool technique_nakedSingleton(tGrid *grid, int row, int column)
+bool technique_nakedSingleton(tGrid *grid, tIndex row, tIndex column)
 {
     bool progress = false;
 
@@ -124,7 +124,7 @@ bool technique_nakedSingleton(tGrid *grid, int row, int column)
     return progress;
 }
 
-bool technique_hiddenSingleton(tGrid *grid, int row, int column)
+bool technique_hiddenSingleton(tGrid *grid, tIndex row, tIndex column)
 {
     tPosition candidatePos;
     int candidate;
@@ -175,23 +175,23 @@ bool technique_hiddenSingleton(tGrid *grid, int row, int column)
 
 int technique_hiddenSingleton_findUniqueCandidate(
     tGrid const *grid,
-    int rStart, int rEnd,
-    int cStart, int cEnd,
+    tIndex rStart, tIndex rEnd,
+    tIndex cStart, tIndex cEnd,
     tPosition *candidatePosition)
 {
     tCandidateCounts candidateCounts = {0};
 
-    for (int r = rStart; r < rEnd; r++) {
-        for (int c = cStart; c < cEnd; c++) {
+    for (tIndex r = rStart; r < rEnd; r++) {
+        for (tIndex c = cStart; c < cEnd; c++) {
             tCell cell = grid->cells[r][c];
-            for (int candidate = 1; candidate <= SIZE; candidate++) {
+            for (tValue candidate = 1; candidate <= SIZE; candidate++) {
                 candidateCounts[candidate] += CELL_HAS_CANDIDATE(cell, candidate);
             }
         }
     }
 
     // Search for the unique candidate
-    int candidate = 1;
+    tValue candidate = 1;
     while (candidate <= SIZE && candidateCounts[candidate] != 1) {
         candidate++;
     }
@@ -201,8 +201,8 @@ int technique_hiddenSingleton_findUniqueCandidate(
         return 0;
     }
 
-    for (int r = rStart; r < rEnd; r++) {
-        for (int c = cStart; c < cEnd; c++) {
+    for (tIndex r = rStart; r < rEnd; r++) {
+        for (tIndex c = cStart; c < cEnd; c++) {
             if (CELL_HAS_CANDIDATE(grid->cells[r][c], candidate)) {
                 *candidatePosition = (tPosition){.row = r, .column = c};
                 return candidate;
@@ -210,19 +210,19 @@ int technique_hiddenSingleton_findUniqueCandidate(
         }
     }
 
-    // Impossible : unique candidate not found even though it was found earlier
+    assert(!"Impossible : unique candidate not found even though it was found earlier");
     abort();
 }
 
-bool technique_nakedPair(tGrid *grid, int row, int column)
+bool technique_nakedPair(tGrid *grid, tIndex row, tIndex column)
 {
     bool progress = false;
 
     tCell *cellRowColumn = &grid->cells[row][column];
 
     if (CELL_CANDIDATE_COUNT(*cellRowColumn) == 2) {
-        int const BLOCK_ROW = BLOCK_INDEX(row);
-        int const BLOCK_COL = BLOCK_INDEX(column);
+        tIndex const BLOCK_ROW = BLOCK_INDEX(row);
+        tIndex const BLOCK_COL = BLOCK_INDEX(column);
 
         tPair2 pair = (tPair2){
             .candidates = {
@@ -231,8 +231,8 @@ bool technique_nakedPair(tGrid *grid, int row, int column)
             .count = 1,
         };
 
-        for (int r = BLOCK_ROW; r < BLOCK_ROW + N && pair.count < 2; r++) {
-            for (int c = BLOCK_COL; c < BLOCK_COL + N && pair.count < 2; c++) {
+        for (tIndex r = BLOCK_ROW; r < BLOCK_ROW + N && pair.count < 2; r++) {
+            for (tIndex c = BLOCK_COL; c < BLOCK_COL + N && pair.count < 2; c++) {
                 pair.count += (r != row || c != column) && TECHNIQUE_NAKED_PAIR_IS_PAIR_CELL(grid->cells[r][c], pair);
             }
         }
@@ -240,8 +240,8 @@ bool technique_nakedPair(tGrid *grid, int row, int column)
         if (pair.count == 2) {
             // Remove all candidates from the block except on the cells containing only the candidates of the pair
             // So we cannot use grid_removeCandidateFromBlock
-            for (int r = BLOCK_ROW; r < BLOCK_ROW + N; r++) {
-                for (int c = BLOCK_COL; c < BLOCK_COL + N; c++) {
+            for (tIndex r = BLOCK_ROW; r < BLOCK_ROW + N; r++) {
+                for (tIndex c = BLOCK_COL; c < BLOCK_COL + N; c++) {
                     bool isNotPairCell = !TECHNIQUE_NAKED_PAIR_IS_PAIR_CELL(grid->cells[r][c], pair);
                     progress |= isNotPairCell && grid_cell_removeCandidate(grid, r, c, pair.candidates[0]);
                     progress |= isNotPairCell && grid_cell_removeCandidate(grid, r, c, pair.candidates[1]);
@@ -253,14 +253,14 @@ bool technique_nakedPair(tGrid *grid, int row, int column)
     return progress;
 }
 
-bool technique_hiddenPair(tGrid *grid, int row, int column)
+bool technique_hiddenPair(tGrid *grid, tIndex row, tIndex column)
 {
     tPosition pairCellPositions[PAIR_SIZE] = {(tPosition){.row = row, .column = column}};
-    int candidates[PAIR_SIZE];
+    tValue candidates[PAIR_SIZE];
     bool progress = false;
 
-    int const BLOCK_ROW = BLOCK_INDEX(row);
-    int const BLOCK_COL = BLOCK_INDEX(column);
+    tIndex const BLOCK_ROW = BLOCK_INDEX(row);
+    tIndex const BLOCK_COL = BLOCK_INDEX(column);
 
     tCell *cellRowColumn = &grid->cells[row][column];
 
@@ -282,9 +282,9 @@ bool technique_hiddenPair(tGrid *grid, int row, int column)
 
 bool technique_hiddenPair_findPair(
     tGrid const *grid,
-    int rStart, int rEnd,
-    int cStart, int cEnd,
-    tPosition pairCellPositions[PAIR_SIZE], int candidates[PAIR_SIZE])
+    tIndex rStart, tIndex rEnd,
+    tIndex cStart, tIndex cEnd,
+    tPosition pairCellPositions[PAIR_SIZE], tValue candidates[PAIR_SIZE])
 {
     tCell firstPairCell = grid->cells[pairCellPositions[0].row][pairCellPositions[0].column];
 
@@ -315,18 +315,18 @@ bool technique_hiddenPair_findPair(
 }
 
 bool technique_hiddenPair_findPairCells(
-    tGrid const *grid, int const candidates[PAIR_SIZE],
-    int rStart, int rEnd,
-    int cStart, int cEnd,
+    tGrid const *grid, tValue const candidates[PAIR_SIZE],
+    tIndex rStart, tIndex rEnd,
+    tIndex cStart, tIndex cEnd,
     tPosition pairCellPositions[PAIR_SIZE])
 {
-    int nbPairCells = 1; // Count of cells found containing the pair (candidate1, candidate2).
-    int nbPairCellsContainingOtherCandidates = 0;
+    tCount nbPairCells = 1; // Count of cells found containing the pair (candidate1, candidate2).
+    tCount nbPairCellsContainingOtherCandidates = 0;
 
     // Searching for hidden pairs
     // Add each cell that contain both candidates
-    for (int r = rStart; r < rEnd && nbPairCells <= PAIR_SIZE + 1; r++) {
-        for (int c = cStart; c < cEnd && nbPairCells <= PAIR_SIZE + 1; c++) {
+    for (tIndex r = rStart; r < rEnd && nbPairCells <= PAIR_SIZE + 1; r++) {
+        for (tIndex c = cStart; c < cEnd && nbPairCells <= PAIR_SIZE + 1; c++) {
             if (r == pairCellPositions[0].row && c == pairCellPositions[0].column) {
                 continue;
             }
@@ -357,14 +357,14 @@ bool technique_hiddenPair_findPairCells(
 bool technique_hiddenPair_removePairCells(
     tGrid *grid,
     tPosition const pairCellPositions[PAIR_SIZE],
-    int const candidates[PAIR_SIZE])
+    tValue const candidates[PAIR_SIZE])
 {
     bool progress = false;
     // For each cell containing the pair:
-    for (int iPos = 0; iPos < PAIR_SIZE; ++iPos) {
+    for (tIndex iPos = 0; iPos < PAIR_SIZE; ++iPos) {
         tPosition pos = pairCellPositions[iPos];
         // remove all its candidates
-        for (int candidate = 1; candidate <= SIZE; ++candidate) {
+        for (tValue candidate = 1; candidate <= SIZE; ++candidate) {
             // except those forming the pair
             progress |= candidate != candidates[0]
                      && candidate != candidates[1]
@@ -386,13 +386,13 @@ bool technique_x_wing(tGrid *grid)
     |   |
     C---D
     ‾   ‾*/
-    for (int colAC = 0; colAC < SIZE; colAC++) {
-        for (int colBD = colAC + 1; colBD < SIZE; colBD++) {
-            for (int candidate = 1; candidate <= SIZE; candidate++) {
-                int rows[2];
-                int candidateInBothCount = 0;
-                int candidateCounts[2] = {0};
-                for (int row = 0; row < SIZE; row++) {
+    for (tIndex colAC = 0; colAC < SIZE; colAC++) {
+        for (tIndex colBD = colAC + 1; colBD < SIZE; colBD++) {
+            for (tValue candidate = 1; candidate <= SIZE; candidate++) {
+                tIndex rows[2];
+                tCount candidateInBothCount = 0;
+                tCount candidateCounts[2] = {0};
+                for (tIndex row = 0; row < SIZE; row++) {
                     bool colACHasCandidate = CELL_HAS_CANDIDATE(grid->cells[row][colAC], candidate);
                     bool colBDHasCandidate = CELL_HAS_CANDIDATE(grid->cells[row][colBD], candidate);
                     candidateCounts[0] += colACHasCandidate;
@@ -406,7 +406,7 @@ bool technique_x_wing(tGrid *grid)
                 }
                 if (candidateInBothCount == 2 && candidateCounts[0] == 2 && candidateCounts[1] == 2) {
                     // eliminate the candidate from the rows (AB) and (CD).
-                    for (int c = 0; c < SIZE; c++) {
+                    for (tIndex c = 0; c < SIZE; c++) {
                         // do not remove the candidate from the cells that form the X.
                         progress |= c != colAC && c != colBD && grid_cell_removeCandidate(grid, rows[0], c, candidate);
                         progress |= c != colAC && c != colBD && grid_cell_removeCandidate(grid, rows[1], c, candidate);
@@ -422,13 +422,13 @@ bool technique_x_wing(tGrid *grid)
     (A---B)
      |   |
     (C---D)*/
-    for (int rowAB = 0; rowAB < SIZE; rowAB++) {
-        for (int rowCD = rowAB + 1; rowCD < SIZE; rowCD++) {
-            for (int candidate = 1; candidate <= SIZE; candidate++) {
-                int columns[2];
-                int candidateInBothCount = 0;
-                int candidateCounts[2] = {0};
-                for (int col = 0; col < SIZE; col++) {
+    for (tIndex rowAB = 0; rowAB < SIZE; rowAB++) {
+        for (tIndex rowCD = rowAB + 1; rowCD < SIZE; rowCD++) {
+            for (tValue candidate = 1; candidate <= SIZE; candidate++) {
+                tIndex columns[2];
+                tCount candidateInBothCount = 0;
+                tCount candidateCounts[2] = {0};
+                for (tIndex col = 0; col < SIZE; col++) {
                     bool rowABHasCandidate = CELL_HAS_CANDIDATE(grid->cells[rowAB][col], candidate);
                     bool rowCDHasCandidate = CELL_HAS_CANDIDATE(grid->cells[rowCD][col], candidate);
                     candidateCounts[0] += rowABHasCandidate;
@@ -442,7 +442,7 @@ bool technique_x_wing(tGrid *grid)
                 }
                 if (candidateInBothCount == 2 && candidateCounts[0] == 2 && candidateCounts[1] == 2) {
                     // elmininate the candidate from the columns (AC) and (BD).
-                    for (int r = 0; r < SIZE; r++) {
+                    for (tIndex r = 0; r < SIZE; r++) {
                         // do not remove the candidate from the cells that form the X.
                         progress |= r != rowAB && r != rowCD && grid_cell_removeCandidate(grid, r, columns[0], candidate);
                         progress |= r != rowAB && r != rowCD && grid_cell_removeCandidate(grid, r, columns[1], candidate);
@@ -455,33 +455,33 @@ bool technique_x_wing(tGrid *grid)
     return progress;
 }
 
-bool grid_removeCandidateFromRow(tGrid *grid, int row, int candidate)
+bool grid_removeCandidateFromRow(tGrid *grid, tIndex row, tValue candidate)
 {
     bool progress = false;
-    for (int c = 0; c < SIZE; c++) {
+    for (tIndex c = 0; c < SIZE; c++) {
         progress |= grid_cell_removeCandidate(grid, row, c, candidate);
     }
     return progress;
 }
 
-bool grid_removeCandidateFromColumn(tGrid *grid, int column, int candidate)
+bool grid_removeCandidateFromColumn(tGrid *grid, tIndex column, tValue candidate)
 {
     bool progress = false;
-    for (int r = 0; r < SIZE; r++) {
+    for (tIndex r = 0; r < SIZE; r++) {
         progress |= grid_cell_removeCandidate(grid, r, column, candidate);
     }
     return progress;
 }
 
-bool grid_removeCandidateFromBlock(tGrid *grid, int row, int column, int candidate)
+bool grid_removeCandidateFromBlock(tGrid *grid, tIndex row, tIndex column, tValue candidate)
 {
     bool progress = false;
 
-    int const BLOCK_ROW = BLOCK_INDEX(row);
-    int const BLOCK_COL = BLOCK_INDEX(column);
+    tIndex const BLOCK_ROW = BLOCK_INDEX(row);
+    tIndex const BLOCK_COL = BLOCK_INDEX(column);
 
-    for (int r = BLOCK_ROW; r < BLOCK_ROW + N; r++) {
-        for (int c = BLOCK_COL; c < BLOCK_COL + N; c++) {
+    for (tIndex r = BLOCK_ROW; r < BLOCK_ROW + N; r++) {
+        for (tIndex c = BLOCK_COL; c < BLOCK_COL + N; c++) {
             progress |= grid_cell_removeCandidate(grid, r, c, candidate);
         }
     }

@@ -33,7 +33,7 @@
 /// @return The first value in the range [1 ; @ref SIZE] that is a candidate of @p cell.
 /// @remark This macro is equivalent to calling @c cell_candidateAt(cell,1) but offers better performance as it does not require the overhead of a function call.
 #define CELL_GET_FIRST_CANDIDATE(cell, outVarName)  \
-    int outVarName = 1;                             \
+    tValue outVarName = 1;                             \
     while (!CELL_HAS_CANDIDATE(cell, outVarName)) { \
         outVarName++;                               \
     }
@@ -42,6 +42,6 @@
 /// @param cell in: the cell
 /// @param n in: the one-based index of the candidate to get
 /// @return The nth candidate of @p cell.
-int cell_candidateAt(tCell const *cell, int n);
+int cell_candidateAt(tCell const *cell, tIndex n);
 
 #endif // T_CELL_H

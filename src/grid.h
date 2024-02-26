@@ -43,21 +43,26 @@
 /// @param outVarName Name of the variable to declare and assign the result to.
 /// @return The amount of values for which @ref POSSIBLE returns @c true.
 #define GRID_CELL_POSSIBLE_VALUES_COUNT(grid, row, column, outVarName) \
-    int outVarName = 0;                                                \
+    tCount outVarName = 0;                                             \
     for (int val = 1; val <= SIZE; val++) {                            \
         outVarName += POSSIBLE(grid, row, column, val);                \
     }
 
-/// @brief Initializes a grid from a file.
-/// @param inStream in: the *.sud file to read
+/// @brief Loads a grid from a file in the Sud format.
+/// @param inStream in: the file to read
 /// @param grid out: the grid to initialize
 /// @return 0 if everything went well, or @ref ERROR_INVALID_DATA if the file contains invalid data.
 int grid_load(FILE *inStream, tGrid *grid);
 
+/// @brief Writes a grid to a file in the Sud format.
+/// @param grid in: the grid to write
+/// @param outStream in: the file to write to
+void grid_write(tGrid const *grid, FILE *outStream);
+
 /// @brief Initializes the grid: adds the candidates and marks the values as possible or not.
 /// @param grid in/out: the grid
 /// @param gridValues in: the grid's values
-void grid_initialize(tGrid *grid, tIntegerGrid gridValues);
+void grid_initialize(tGrid *grid, tInt32Grid gridValues);
 
 // The functions that affect the value of the cells are not defined in tCell because they need the coordinates of the cell on the grid.
 // These coordinates allow for POSSIBLE to have a complexity of O(1), which represents a substantial performance gain.
@@ -68,13 +73,39 @@ void grid_initialize(tGrid *grid, tIntegerGrid gridValues);
 /// @param column in: the cell's column
 /// @param candidate in: the candidate to remove
 /// @return Whether the candidate has been removed.
-bool grid_cell_removeCandidate(tGrid *grid, int row, int column, int candidate);
+bool grid_cell_removeCandidate(tGrid *grid, tIndex row, tIndex column, tValue candidate);
 
 /// @brief Defines the value of a cell and removes all its candidates.
 /// @param grid in/out: the grid
 /// @param row in: the cell's row
 /// @param column in: the cell's column
 /// @param candidate in: the value to provide to the cell
-void grid_cell_provideValue(tGrid *grid, int row, int column, int value);
+void grid_cell_provideValue(tGrid *grid, tIndex row, tIndex column, tValue value);
+
+/// @brief Prints a grid.
+/// @param grid in: @ref tGrid : the grid to print
+/// @param outStream in: the file to write to
+void grid_print(tGrid const *grid, FILE *outStream);
+
+/// @brief Prints a block separation line.
+/// @param outStream in: the file to write to
+void printBlockSeparationLine(FILE *outStream);
+
+/// @brief Prints a grid row.
+/// @param grid in: @ref tGrid : the grid
+/// @param row in : index of the row to print (between 0 and @ref SIZE - 1)
+/// @param outStream in: the file to write to
+void grid_printRow(tGrid const *grid, tIndex row, FILE *outStream);
+
+/// @brief Prints a grid value as a number or @ref DISPLAY_EMPTY_VALUE for empty values.
+/// @param value in: the value to print
+/// @param outStream in: the file to write to
+void printValue(tValue value, FILE *outStream);
+
+/// @brief Prints a character a specific amount of times.
+/// @param character in: the character to print
+/// @param times in: amount of times
+/// @param outStream in: the file to write to
+void printMultipleTimes(char character, unsigned times, FILE *outStream);
 
 #endif // SUDOKU_H

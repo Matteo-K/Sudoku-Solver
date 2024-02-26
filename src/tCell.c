@@ -10,12 +10,12 @@
 #include "const.h"
 #include "tCell.h"
 
-int cell_candidateAt(tCell const *cell, int n)
+int cell_candidateAt(tCell const *cell, tIndex n)
 {
     assert(n <= SIZE);
     assert(1 <= n && n <= SIZE);
 
-    int candidate = 0;
+    tValue candidate = 0;
 
     while (n > 0 && candidate <= SIZE) {
         candidate++;

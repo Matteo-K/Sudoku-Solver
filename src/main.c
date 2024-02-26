@@ -7,23 +7,47 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
-#include "resolution.h"
 #include "grid.h"
+#include "resolution.h"
 
-int main()
+#if _POSIX_C_SOURCE < 2 && !_XOPEN_SOURCE
+#error "POSIX.2 or X/Open 4.2 required"
+#endif
+
+int main(int argc, char **argv)
 {
+    bool opt_see = false, opt_human = false;
+
+    // Parse command-line options
+    int opt;
+    while ((opt = getopt(argc, argv, "sh")) != -1) {
+        switch (opt) {
+        case 's':
+            opt_see = true;
+            break;
+        case 'h':
+            opt_human = true;
+            break;
+        case '?':
+            return EXIT_INVALID_OPTION;
+        default:
+            abort();
+        }
+    }
+
     tGrid grid;
 
     // Load the grid
     switch (grid_load(stdin, &grid)) {
     case ERROR_INVALID_DATA:
         fprintf(stderr, "The input is not a Sudoku grid of size N=%d.\n", N);
-        return EXIT_FAILURE;
+        return EXIT_INVALID_DATA;
     }
 
     // Solve the grid
-    {
+    if (!opt_see) {
         bool progress; // if progress has been made since the last iteration
 
         do {
@@ -41,8 +65,8 @@ int main()
         // Collect the positions of the remaining empty cells for backtracking
         tPositionArray emptyCellPositions;
         int emptyCellCount = 0;
-        for (int r = 0; r < SIZE; r++) {
-            for (int c = 0; c < SIZE; c++) {
+        for (tIndex r = 0; r < SIZE; r++) {
+            for (tIndex c = 0; c < SIZE; c++) {
                 if (!CELL_HAS_VALUE(grid.cells[r][c])) {
                     emptyCellPositions[emptyCellCount++] = (tPosition){.row = r, .column = c};
                 }
@@ -54,13 +78,10 @@ int main()
     }
 
     // Output the solved grid
-    for (int r = 0; r < SIZE; r++) {
-        for (int c = 0; c < SIZE; c++) {
-            if (fwrite(&grid.cells[r][c]._value, sizeof(int), 1, stdout) != 1) {
-                fprintf(stderr, "Error writing the solved grid to output.\n");
-                return EXIT_FAILURE;
-            };
-        }
+    if (opt_human) {
+        grid_print(&grid, stdout);
+    } else {
+        grid_write(&grid, stdout);
     }
 
     return EXIT_SUCCESS;
