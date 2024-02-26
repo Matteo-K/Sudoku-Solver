@@ -43,7 +43,7 @@ bool perform_simpleTechniques(tGrid *grid)
     return progress;
 }
 
-bool technique_backtracking(tGrid *grid, tPositionArray emptyCellPositions, tCount emptyCellCount, tIndex iCellPosition)
+bool technique_backtracking(tGrid *grid, tPositionArray emptyCellPositions, tIndex emptyCellCount, tIndex iCellPosition)
 {
     // This technique does not use candidates but value presence arrays.
     // The reason is that synchronizing the candidates between recursive calls requires loops.
@@ -82,7 +82,7 @@ bool technique_backtracking(tGrid *grid, tPositionArray emptyCellPositions, tCou
     return false;
 }
 
-void technique_backtracking_swap_cells(tGrid const *grid, tPositionArray emptyCellPositions, tCount emptyCellCount, tIndex iHere)
+void technique_backtracking_swap_cells(tGrid const *grid, tPositionArray emptyCellPositions, tIndex emptyCellCount, tIndex iHere)
 {
     assert(iHere < emptyCellCount);
 
@@ -320,8 +320,8 @@ bool technique_hiddenPair_findPairCells(
     tIndex cStart, tIndex cEnd,
     tPosition pairCellPositions[PAIR_SIZE])
 {
-    tCount nbPairCells = 1; // Count of cells found containing the pair (candidate1, candidate2).
-    tCount nbPairCellsContainingOtherCandidates = 0;
+    tIndex nbPairCells = 1; // Count of cells found containing the pair (candidate1, candidate2).
+    tIndex nbPairCellsContainingOtherCandidates = 0;
 
     // Searching for hidden pairs
     // Add each cell that contain both candidates
@@ -390,8 +390,8 @@ bool technique_x_wing(tGrid *grid)
         for (tIndex colBD = colAC + 1; colBD < SIZE; colBD++) {
             for (tValue candidate = 1; candidate <= SIZE; candidate++) {
                 tIndex rows[2];
-                tCount candidateInBothCount = 0;
-                tCount candidateCounts[2] = {0};
+                tIndex candidateInBothCount = 0;
+                tIndex candidateCounts[2] = {0};
                 for (tIndex row = 0; row < SIZE; row++) {
                     bool colACHasCandidate = CELL_HAS_CANDIDATE(grid->cells[row][colAC], candidate);
                     bool colBDHasCandidate = CELL_HAS_CANDIDATE(grid->cells[row][colBD], candidate);
@@ -426,8 +426,8 @@ bool technique_x_wing(tGrid *grid)
         for (tIndex rowCD = rowAB + 1; rowCD < SIZE; rowCD++) {
             for (tValue candidate = 1; candidate <= SIZE; candidate++) {
                 tIndex columns[2];
-                tCount candidateInBothCount = 0;
-                tCount candidateCounts[2] = {0};
+                tIndex candidateInBothCount = 0;
+                tIndex candidateCounts[2] = {0};
                 for (tIndex col = 0; col < SIZE; col++) {
                     bool rowABHasCandidate = CELL_HAS_CANDIDATE(grid->cells[rowAB][col], candidate);
                     bool rowCDHasCandidate = CELL_HAS_CANDIDATE(grid->cells[rowCD][col], candidate);

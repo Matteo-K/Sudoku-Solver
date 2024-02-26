@@ -12,14 +12,16 @@
 #include "const.h"
 
 /// @brief Type of a grid value.
-/// @remark Range : [0; @ref N]
+/// @remark Range : [0; @ref MAX_N]
 typedef uint_least8_t tValue;
 /// @brief Type of a grid index.
-/// @remark Range : [0; @ref SIZE]
-typedef uint_least8_t tIndex;
-/// @brief Type of a grid value count.
-/// @remark Range : [0; @ref SIZE]
-typedef uint_least8_t tCount;
+/// @remark Range : [0; @ref MAX_SIZE]
+typedef uint_least16_t tIndex;
+
+/// @brief Maximum value of the grid size factor.
+#define MAX_N UINT_LEAST8_MAX
+/// @brief Maximum number of tiles in the grid. Equivalent to @ref MAX_N²
+#define MAX_SIZE UINT_LEAST16_MAX
 
 /// @brief A cell of a Sudoku grid
 typedef struct {
@@ -77,11 +79,11 @@ typedef struct {
     tValue candidates[PAIR_SIZE];
     /// @brief Count of candidates
     /// @remark In range [0 ; @ref PAIR_SIZE]
-    tCount count;
+    tIndex count;
 } tPair2;
 
 /// @brief Integer array representing the number of occurences for each candidate.
 /// @remark The first case of the array, at index 0 is unused. This is to allow direct indexation with the candidate value.
-typedef tCount tCandidateCounts[SIZE + 1];
+typedef tIndex tCandidateCounts[SIZE + 1];
 
 #endif // TYPES_H

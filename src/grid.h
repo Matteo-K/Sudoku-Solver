@@ -43,7 +43,7 @@
 /// @param outVarName Name of the variable to declare and assign the result to.
 /// @return The amount of values for which @ref POSSIBLE returns @c true.
 #define GRID_CELL_POSSIBLE_VALUES_COUNT(grid, row, column, outVarName) \
-    tCount outVarName = 0;                                             \
+    tIndex outVarName = 0;                                             \
     for (int val = 1; val <= SIZE; val++) {                            \
         outVarName += POSSIBLE(grid, row, column, val);                \
     }

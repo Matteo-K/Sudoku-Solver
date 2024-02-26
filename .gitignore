@@ -1,3 +1,15 @@
+# Binaries
+/bin/*
+
+# VSCode
+profile/
+.vscode/
+
+# Python cache
+*.pyc
+
+# -- C template
+
 # Prerequisites
 *.d
 
@@ -50,3 +62,4 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+

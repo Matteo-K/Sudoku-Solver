@@ -23,7 +23,7 @@ bool perform_simpleTechniques(tGrid *grid);
 /// @return Whether progress has been made.
 /// @remark This technique must be performed last, as it will always solve the grid completely.
 /// @remark After calling this function, it is possible that the candidates of the grid have an inconsistent state. This choice was made because it offers a performance gain and we no longer need the candidates once the grid is solved.
-bool technique_backtracking(tGrid *grid, tPositionArray emptyCellPositions, tCount emptyCellCount, tIndex iEmptyCellPosition);
+bool technique_backtracking(tGrid *grid, tPositionArray emptyCellPositions, tIndex emptyCellCount, tIndex iEmptyCellPosition);
 
 /// @brief Swaps the cell at @p iHere with the cell after @p iHere having the least possible values in @p emptyCellPositions.
 /// @param grid in: the grid
@@ -31,7 +31,7 @@ bool technique_backtracking(tGrid *grid, tPositionArray emptyCellPositions, tCou
 /// @param emptyCellCount in: the amount of empty cells (length of @p emptyCellPositions)
 /// @param iHere in: the index of the cell to swap
 /// @remark Used in the backtracking technique.
-void technique_backtracking_swap_cells(tGrid const *grid, tPositionArray emptyCellPositions, tCount emptyCellCount, tIndex iHere);
+void technique_backtracking_swap_cells(tGrid const *grid, tPositionArray emptyCellPositions, tIndex emptyCellCount, tIndex iHere);
 
 /// @brief Performs the naked singleton technique.
 /// @param grid in/out: the grid

@@ -8,7 +8,7 @@ Created by [Matteo-K](https://github.com/Matteo-K) and [Scover](https://github.c
 
 `sudosolve [OPTION]... [N:integer]`
 
-$N$ represents the grid size factor (usually 3 for regular Sudoku grids that have 9 rows and columns). Must be in range $[1 ; `INT_MAX_`]$.
+$N$ represents the grid size factor (usually 3 for regular Sudoku grids that have 9 rows and columns). Must be in range $[1 ; `MAX_N`]$.
 
 The grid is read from standard input.
 
@@ -45,10 +45,8 @@ Even a grid of size $N=100$ would consume 933 gigabytes of memory assuming `size
 
 Binary format for a Sudoku grid.
 
-Value are stored as unsigned little-endian 4-byte integers.
+Value are stored as unsigned little-endian 32-bit integers.
 
 File size is $4N^4$ bytes.
 
 Empty values are indicated by 0.
-
-Since the values are stored as 4-bytes integers the maximum is $2^{31}-1$, hence the maximum value of N, $\lfloor\sqrt{2^{32}-1}\rfloor = 65535$.
