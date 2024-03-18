@@ -2,8 +2,8 @@
 /bin/*
 
 # VSCode
-profile/
 .vscode/
+profile/
 
 # Python cache
 *.pyc

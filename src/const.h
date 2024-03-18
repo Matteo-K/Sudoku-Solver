@@ -6,14 +6,8 @@
 #ifndef CONST_H
 #define CONST_H
 
-/// @brief Integer: grid size factor
-#define N 4
-
-/// @brief Integer: grid side
-#define SIZE (N * N)
-
 /// @brief Integer: error code for invalid data in a file
-#define ERROR_INVALID_DATA -1
+#define ERROR_INVALID_DATA (-1)
 
 /// @brief Integer: exit code for an invalid option
 #define EXIT_INVALID_OPTION 1
@@ -22,6 +16,9 @@
 
 /// @brief Integer: size of a pair of candidates
 #define PAIR_SIZE 2
+
+/// @brief Defines that the memory debugger should give verbose output.
+//#define MEMDBG_VERBOSE
 
 /* Display configuration macros */
 

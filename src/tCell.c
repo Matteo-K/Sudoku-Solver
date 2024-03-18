@@ -10,17 +10,16 @@
 #include "const.h"
 #include "tCell.h"
 
-int cell_candidateAt(tCell const *cell, tIndex n)
+int cell_candidateAt(tCell const *cell, tIntSize n)
 {
-    assert(n <= SIZE);
-    assert(1 <= n && n <= SIZE);
+    assert(n <= cell_candidate_count(*cell));
 
-    tValue candidate = 0;
+    tIntSize candidate = 0;
 
-    while (n > 0 && candidate <= SIZE) {
+    while (n > 0) {
         candidate++;
         n -= cell->hasCandidate[candidate];
     }
 
-    return candidate > SIZE ? 0 : candidate;
+    return candidate;
 }
