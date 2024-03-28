@@ -5,6 +5,8 @@
 #include <signal.h>
 #include <stdarg.h>
 
+#ifdef MEMDBG_ENABLE
+
 #undef malloc
 #undef calloc
 #undef free
@@ -38,6 +40,12 @@ static AllocationsMapItem *gs_allocations_map;
 
 static bool gs_initialized = false;
 
+#ifdef MEMBDG_VERBOSE
+#define verbose
+#else
+#define verbose __attribute__((unused))
+#endif
+
 static void signalHandler(int sigid)
 {
     if (sigid == SIGABRT) {
@@ -56,7 +64,7 @@ void lazyInit(void)
     gs_initialized = true;
 }
 
-void *dbg_malloc(char const *file, int line, size_t size)
+void *dbg_malloc(verbose char const *file, verbose int line, size_t size)
 {
     lazyInit();
     void *ptr = malloc(size);
@@ -73,7 +81,7 @@ void *dbg_malloc(char const *file, int line, size_t size)
     return ptr;
 }
 
-void *dbg_calloc(char const *file, int line, size_t nmemb, size_t size)
+void *dbg_calloc(verbose char const *file, verbose int line, size_t nmemb, size_t size)
 {
     lazyInit();
     void *ptr = calloc(nmemb, size);
@@ -208,3 +216,5 @@ also maybe we could make dbg_[mc]alloc artificially return NULL to test error ha
 
 (lazy initialize the map with a macro so we do not need a dedicated initialization function)
 */
+
+#endif // MEMDBG_ENABLE

@@ -2,7 +2,6 @@
 #define MEMDBG_H
 
 #include <assert.h>
-#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -13,6 +12,28 @@
 #endif
 
 #define EXIT_MALLOC_FAILED (-1)
+
+
+#ifdef NDEBUG
+
+// Disable memory allocation checks.
+#define check_alloc(mallocResult, ...) (mallocResult)
+
+#define dbg_fail(fmt_msg, ...) ;
+
+#define memdbg_cleanup() ;
+
+#else
+
+#define MEMDBG_ENABLE
+
+#define dbg_fail(fmt_msg, ...)                                \
+    do {                                                      \
+        fprintf(stderr, (fmt_msg)__VA_OPT__(, ) __VA_ARGS__); \
+        putc('\n', stderr);                                   \
+        assert(!(fmt_msg));                                   \
+    } while (0)
+
 
 /// @brief Prints information about the state of the heap.
 /// @param outStream in: the stream to print to.
@@ -25,22 +46,6 @@ void perform_emergencyMemoryCleanup(void);
 
 /// @brief Cleans up the memdbg library.
 void memdbg_cleanup(void);
-
-#ifdef NDEBUG
-
-// Disable memory allocation checks.
-#define check_alloc(mallocResult, fmt_allocComment) (mallocResult)
-
-#define dbg_fail(fmt_msg, ...) ;
-
-#else
-
-#define dbg_fail(fmt_msg, ...)                                \
-    do {                                                      \
-        fprintf(stderr, (fmt_msg)__VA_OPT__(, ) __VA_ARGS__); \
-        putc('\n', stderr);                                   \
-        assert(!(fmt_msg));                                   \
-    } while (false)
 
 /// @brief Checks that an allocation succeeded and adds a comment to it for memory debugging
 /// @param mallocResult in: result of the memory allocation

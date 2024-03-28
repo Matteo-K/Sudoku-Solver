@@ -17,11 +17,11 @@
 
 #define array2d_malloc(name, rowCount, colCount) malloc(sizeof *(name) * (rowCount) * (colCount))
 #define array2d_calloc(name, rowCount, colCount) calloc(sizeof *(name), (rowCount) * (colCount))
-#define at2d(rowCount, row, col) ((rowCount) * (row) + (col))
+#define at2d(colCount, row, col) ((colCount) * (row) + (col))
 
 #define array3d_malloc(name, xSize, ySize, zSize) malloc(sizeof *(name) * (xSize) * (ySize) * (zSize))
 #define array3d_calloc(name, xSize, ySize, zSize) calloc(sizeof *(name), (xSize) * (ySize) * (zSize))
-#define at3d(xSize, ySize, x, y, z) ((xSize) * (x) + (ySize) * (y) + (z))
+#define at3d(ySize, zSize, x, y, z) ((ySize) * (zSize) * (x) + (zSize) * (y) + (z))
 
 /// @brief Type for a N-majored integer.
 /// @remark Range : [0; @ref MAX_N]
