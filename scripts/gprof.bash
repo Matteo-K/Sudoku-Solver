@@ -7,15 +7,17 @@ if [[ $# -ne 4 ]]; then
 fi
 
 # Resolve arguments
-file_exe=$(realpath -e $1)
-file_grid=$(realpath -e $2)
-str_gridName=$3
-dir_out=$(realpath -m $4)
+file_exe=$(realpath -e "$1")
+file_grid=$(realpath -e "$2")
+str_gridName=$(tr '/' '-' <<< "$3")
+dir_out=$(realpath -m "$4")
+
+n=$(bc <<<  "sqrt(sqrt($(stat -c %s $file_grid) / 4))")
 
 pushd $(dirname $file_exe)
 
 # Run program
-$file_exe < $file_grid
+$file_exe $n -s < $file_grid
 
 # Run gprof
 mkdir -p $dir_out

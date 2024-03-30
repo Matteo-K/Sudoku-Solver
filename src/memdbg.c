@@ -3,6 +3,7 @@
 #include "utils.h"
 #include <inttypes.h>
 #include <signal.h>
+#include <stdbool.h>
 #include <stdarg.h>
 
 #ifdef MEMDBG_ENABLE

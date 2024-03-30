@@ -60,10 +60,12 @@ typedef struct {
     tCell *cells;
 
     /// @brief Grid side.
-    tIntSize const SIZE;
+    /// @remark This member is semantically constant and should not be reassigned.
+    tIntSize SIZE;
 
     /// @brief Grid size factor.
-    tIntN const N;
+    /// @remark This member is semantically constant and should not be reassigned.
+    tIntN N;
 
     /// @brief Boolean dynamic matrix representing for each column whether the value is present or not.
     /// @remark Dimensions: [columnIndex][value]

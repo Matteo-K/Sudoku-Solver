@@ -85,6 +85,6 @@ if __name__ == '__main__':
     errors = list(filter(None, grid_get_errors(grid, n)))
     if errors:
         print('\n'.join(errors))
-        print(f'This Sudoku grid is not valid ({len(errors)} errors).')
+        print(f'Sudoku grid not valid ({len(errors)} errors).')
     else:
-        print('This Sudoku grid is valid.')
+        print(f'Sudoku grid valid.')

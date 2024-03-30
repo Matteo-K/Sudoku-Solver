@@ -125,19 +125,22 @@ void grid_print(tGrid const *grid, FILE *outStream);
 
 /// @brief Prints a block separation line.
 /// @param grid in: the grid
+/// @param padding in: value padding
 /// @param outStream in: the file to write to
-void printBlockSeparationLine(tGrid const *grid, FILE *outStream);
+void printBlockSeparationLine(tGrid const *grid, int padding, FILE *outStream);
 
 /// @brief Prints a grid row.
 /// @param grid in: @ref tGrid : the grid
 /// @param row in: index of the row to print (between 0 and @ref SIZE - 1)
+/// @param padding in: value padding
 /// @param outStream in: the file to write to
-void grid_printRow(tGrid const *grid, tIntSize row, FILE *outStream);
+void grid_printRow(tGrid const *grid, tIntSize row, int padding, FILE *outStream);
 
 /// @brief Prints a grid value as a number or @ref DISPLAY_EMPTY_VALUE for empty values.
 /// @param value in: the value to print
+/// @param padding in: value padding
 /// @param outStream in: the file to write to
-void printValue(tIntSize value, FILE *outStream);
+void printValue(tIntSize value, int padding, FILE *outStream);
 
 /// @brief Prints a character a specific amount of times.
 /// @param character in: the character to print

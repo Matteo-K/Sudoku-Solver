@@ -10,6 +10,7 @@
 #include "const.h"
 #include "grid.h"
 #include "memdbg.h"
+#include "utils.h"
 
 tGrid grid_create(tIntN const N)
 {
@@ -186,41 +187,43 @@ void grid_write(tGrid const *grid, FILE *outStream)
 void grid_print(tGrid const *grid, FILE *outStream)
 {
     // Print grid body
+    int padding = digitCount(grid->SIZE, 10);
+
     for (tIntSize block = 0; block < grid->N; block++) {
-        printBlockSeparationLine(grid, outStream);
+        printBlockSeparationLine(grid, padding, outStream);
 
         // For eahc line in the block:
         for (tIntSize blockRow = 0; blockRow < grid->N; blockRow++) {
             // Find the actual line and print it
-            grid_printRow(grid, block * grid->N + blockRow, outStream);
+            grid_printRow(grid, block * grid->N + blockRow, padding, outStream);
         }
     }
 
     // Print the last separation line all the way down
-    printBlockSeparationLine(grid, outStream);
+    printBlockSeparationLine(grid, padding, outStream);
 }
 
-void printBlockSeparationLine(tGrid const *grid, FILE *outStream)
+void printBlockSeparationLine(tGrid const *grid, int padding, FILE *outStream)
 {
     putc(DISPLAY_INTERSECTION, outStream);
 
     for (tIntSize block = 0; block < grid->N; block++) {
         // Add 2 to account for horizontal value margin (1 space left and right)
-        printMultipleTimes(DISPLAY_HORIZONTAL_LINE, grid->N * (DISPLAY_PADDING + 2), outStream);
+        printMultipleTimes(DISPLAY_HORIZONTAL_LINE, grid->N * (padding + 2), outStream);
         putc(DISPLAY_INTERSECTION, outStream);
     }
 
     putc('\n', outStream);
 }
 
-void grid_printRow(tGrid const *grid, tIntSize row, FILE *outStream)
+void grid_printRow(tGrid const *grid, tIntSize row, int padding, FILE *outStream)
 {
     putc(DISPLAY_VERTICAL_LINE, outStream);
 
     // Print line content
     for (tIntSize block = 0; block < grid->N; block++) {
         for (tIntSize blockCol = 0; blockCol < grid->N; blockCol++) {
-            printValue(grid_cellAt(*grid, row, block * grid->N + blockCol)._value, outStream);
+            printValue(grid_cellAt(*grid, row, block * grid->N + blockCol)._value, padding, outStream);
         }
         putc(DISPLAY_VERTICAL_LINE, outStream);
     }
@@ -228,14 +231,14 @@ void grid_printRow(tGrid const *grid, tIntSize row, FILE *outStream)
     putc('\n', outStream);
 }
 
-void printValue(tIntSize value, FILE *outStream)
+void printValue(tIntSize value, int padding, FILE *outStream)
 {
     putc(DISPLAY_SPACE, outStream);
 
     if (value == 0) {
-        fprintf(outStream, "%*c", DISPLAY_PADDING, DISPLAY_EMPTY_VALUE);
+        fprintf(outStream, "%*c", padding, DISPLAY_EMPTY_VALUE);
     } else {
-        fprintf(outStream, "%*d", DISPLAY_PADDING, value);
+        fprintf(outStream, "%*d", padding, value);
     }
 
     putc(DISPLAY_SPACE, outStream);

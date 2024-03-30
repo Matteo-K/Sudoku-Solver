@@ -1,39 +1,37 @@
-# Sudoku Solve
+# Sudone
 
-Fast Linux Sudoku solver
+Optimized Linux command-line Sudoku solver.
 
 Created by [Matteo-K](https://github.com/Matteo-K) and [Scover](https://github.com/5cover) (see [license](LICENSE)).
 
 ## Usage
 
-`sudosolve [OPTION]... [N:integer]`
+`sudone N -[sbh]`
 
-$N$ represents the grid size factor (usually 3 for regular Sudoku grids that have 9 rows and columns). Must be in range $[1 ; `MAX_N`]$.
-
+N : the grid size factor (usually 3 for regular Sudoku grids that have 9 rows and columns).
 The grid is read from standard input.
 
-The solved grid is printed to standard ouptut in the Sud format.
-
-### Options reference
+### Options
 
 Option|Description
 -|-
-`-s`|**See** the grid: Don't solve the grid before printing it (default is to solve the grid)
-`-h`|Print the grid in a **human-readable** format (default is Sud format)
+`-s`|**Solve** the grid before printing it.
+`-b`|**Binary** (Sud format) grid output
+`-h`|Print **help** and exit.
 
 ### Examples
 
 Solve a grid then view it:
 
-`sudosolve -h < grid.sud`
+`sudone -s < grid.sud`
 
 Solve a grid and save the solved grid in the Sud format:
 
-`sudosolve < grid.sud > solved.sud`
+`sudone -sb < grid.sud > solved.sud`
 
 View a grid:
 
-`sudosolve -sh < grid.sud`
+`sudone < grid.sud`
 
 ### Remarks
 

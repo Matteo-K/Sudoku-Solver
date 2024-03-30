@@ -12,8 +12,7 @@ file_grid=$(realpath -e $2)
 
 # File size : 4N⁴ bytes
 # N = (file size / 4)^(1/4)
-size=$(stat -c %s $file_grid)
-n=$(bc <<<  "sqrt(sqrt($size / 4))")
+n=$(bc <<<  "sqrt(sqrt($(stat -c %s $file_grid) / 4))")
 
-$file_exe < $file_grid | scripts/check.py $n
+$file_exe $n -sb < $file_grid | scripts/check.py $n
 echo N=$n

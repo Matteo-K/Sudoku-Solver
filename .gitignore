@@ -8,6 +8,10 @@ profile/
 # Python cache
 *.pyc
 
+# Gcov
+*.gcno
+*.gcda
+
 # -- C template
 
 # Prerequisites

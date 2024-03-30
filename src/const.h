@@ -6,11 +6,13 @@
 #ifndef CONST_H
 #define CONST_H
 
+#define PROGRAM_NAME "sudone"
+
 /// @brief Integer: error code for invalid data in a file
 #define ERROR_INVALID_DATA (-1)
 
-/// @brief Integer: exit code for an invalid option
-#define EXIT_INVALID_OPTION 1
+/// @brief Integer: exit code for invalid arguments
+#define EXIT_INVALID_ARG 1
 /// @brief Integer: exit code for invalid data in a file
 #define EXIT_INVALID_DATA 2
 
@@ -19,11 +21,6 @@
 
 /// @brief Defines that the memory debugger should give verbose output.
 //#define MEMDBG_VERBOSE
-
-/* Display configuration macros */
-
-/// @brief Integer: grid value padding
-#define DISPLAY_PADDING 2 // SIZE's base 10 digit count
 
 /* Display character macros */
 

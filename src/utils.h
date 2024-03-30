@@ -3,8 +3,11 @@
 
 #include <stdarg.h>
 #include <stdlib.h>
+#include <math.h>
 
 #define bufferSize(format, args) (vsnprintf(NULL, 0, (format), (args)) + 1) // safe byte for \0
+
+#define digitCount(n, base) ((n) == 0 ? 1 : (int)(log(n) / log(base)) + 1)
 
 #ifdef __GNUC__
 

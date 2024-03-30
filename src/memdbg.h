@@ -13,27 +13,23 @@
 
 #define EXIT_MALLOC_FAILED (-1)
 
+#define dbg_fail(fmt_msg, ...)                                \
+    do {                                                      \
+        fprintf(stderr, (fmt_msg)__VA_OPT__(, ) __VA_ARGS__); \
+        putc('\n', stderr);                                   \
+        abort();                                               \
+    } while (0)
 
 #ifdef NDEBUG
 
 // Disable memory allocation checks.
 #define check_alloc(mallocResult, ...) (mallocResult)
 
-#define dbg_fail(fmt_msg, ...) ;
-
 #define memdbg_cleanup() ;
 
 #else
 
 #define MEMDBG_ENABLE
-
-#define dbg_fail(fmt_msg, ...)                                \
-    do {                                                      \
-        fprintf(stderr, (fmt_msg)__VA_OPT__(, ) __VA_ARGS__); \
-        putc('\n', stderr);                                   \
-        assert(!(fmt_msg));                                   \
-    } while (0)
-
 
 /// @brief Prints information about the state of the heap.
 /// @param outStream in: the stream to print to.

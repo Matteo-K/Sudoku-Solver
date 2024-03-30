@@ -1,5 +1,5 @@
 /** @file
- * @brief Sudoku Solver main
+ * @brief Sudone main
  * @author 5cover, Matteo-K
  */
 
@@ -19,48 +19,72 @@
 
 static tGrid gs_grid; // Automatically zero-initialized
 
+void print_help(void);
+void perform_emergencyMemoryCleanup(void);
+
 void perform_emergencyMemoryCleanup(void)
 {
     // It's always safe to call grid_free since the pointers inside tGrid and tCell are always either NULL or valid, thanks to static member auto initialization and grid_create.
     grid_free(&gs_grid);
 }
 
+void print_help(void)
+{
+    puts("Sudone: an optimized Sudoku solver");
+    printf("Usage: "PROGRAM_NAME" N -[sbh]\n");
+    puts("Options:");
+    puts("-s : solve the grid");
+    puts("-b : binary (.sud) output");
+    puts("-h : print this help and exit");
+    puts("This is public domain software. Compiled on "__DATE__".");
+}
+
 int main(int argc, char **argv)
 {
-    bool opt_see = false, opt_human = false;
+    bool opt_solve = false, opt_binary = false;
 
     // Parse command-line options
     int opt;
-    while ((opt = getopt(argc, argv, "sh")) != -1) {
+    while ((opt = getopt(argc, argv, "sbh")) != -1) {
         switch (opt) {
         case 's':
-            opt_see = true;
+            opt_solve = true;
+            break;
+        case 'b':
+            opt_binary = true;
             break;
         case 'h':
-            opt_human = true;
-            break;
+            print_help();
+            return EXIT_SUCCESS;
         case '?':
-            return EXIT_INVALID_OPTION;
+            return EXIT_INVALID_ARG;
         default:
             abort();
         }
     }
 
-    {
-        // tGrid has const members, thus it cannot be reassigned, so we need to use memcpy.
-        tGrid g = grid_create(4);
-        memcpy(&gs_grid, &g, sizeof g);
+    // fetch n argument
+    if (optind >= argc) {
+        fprintf(stderr, "%s: N argument missing\n", argv[0]);
+        return EXIT_INVALID_ARG;
     }
+    int const N = atoi(argv[optind]);
+    if (N <= 0 || N > MAX_N) {
+        fprintf(stderr, "%s: the N argument must be an integer between 1 and %d\n", argv[0], MAX_N);
+        return EXIT_INVALID_ARG;
+    }
+
+    gs_grid = grid_create(N);
 
     // Load the grid
     switch (grid_load(stdin, &gs_grid)) {
     case ERROR_INVALID_DATA:
-        fprintf(stderr, "The input is not a Sudoku grid of size N=%d.\n", gs_grid.N);
+        fprintf(stderr, "%s: the input is not a Sudoku grid of size N=%d.\n", argv[0], gs_grid.N);
         return EXIT_INVALID_DATA;
     }
 
     // Solve the grid
-    if (!opt_see) {
+    if (opt_solve) {
         bool progress; // if progress has been made since the last iteration
 
         do {
@@ -94,11 +118,11 @@ int main(int argc, char **argv)
         free(emptyCellPositions);
     }
 
-    // Output the solved grid
-    if (opt_human) {
-        grid_print(&gs_grid, stdout);
-    } else {
+    // Output the grid
+    if (opt_binary) {
         grid_write(&gs_grid, stdout);
+    } else {
+        grid_print(&gs_grid, stdout);
     }
 
     grid_free(&gs_grid);
