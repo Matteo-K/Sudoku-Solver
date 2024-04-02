@@ -32,10 +32,10 @@
 /// @param outVarName Name of the variable to declare and assign the result to.
 /// @return The first value in the range [1 ; @ref SIZE] that is a candidate of @p cell.
 /// @remark This macro is equivalent to calling @c cell_candidateAt(cell,1) but offers better performance as it does not require the overhead of a function call.
-#define cell_get_first_candidate(cell, outVarName)  \
-    tIntSize outVarName = 1;                        \
+#define cell_get_first_candidate(cell, outVarName) \
+    tIntSize outVarName = 1;                       \
     while (!cell_hasCandidate(cell, outVarName)) { \
-        outVarName++;                               \
+        outVarName++;                              \
     }
 
 /// @brief Returns the nth candidate of a cell in the range [1 ; @ref SIZE].

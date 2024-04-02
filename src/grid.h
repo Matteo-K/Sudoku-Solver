@@ -1,6 +1,6 @@
 /** @file
  * @brief Sudoku grid functions header
- * @author 5cover, Matteo-K
+ * @author 5cover
  */
 
 #ifndef SUDOKU_H
@@ -15,14 +15,14 @@
 #define grid_cellAt(grid, row, column) (grid).cells[at2d((grid).SIZE, (row), (column))]
 #define grid_cellAtPos(grid, pos) grid_cellAt(grid, pos.row, pos.column)
 /// @brief Defines whether a value is free or not at a position on the grid.
-#define grid_markValueFree(isFree, grid, row, column, value)                                                           \
-    do {                                                                                                               \
-        assert((row) < (grid).SIZE);                                                                                   \
-        assert((column) < (grid).SIZE);                                                                                \
-        assert((value) <= (grid).SIZE);                                                                                \
-        (grid)._isColumnFree[at2d((grid).SIZE + 1, (column), (value))] = (isFree);                                 \
-        (grid)._isRowFree[at2d((grid).SIZE + 1, (row), (value))] = (isFree);                                       \
-        (grid)._isBlockFree[at3d((grid).N, (grid).SIZE + 1, (row) / (grid).N, (column) / (grid).N, (value))] = (isFree);      \
+#define grid_markValueFree(isFree, grid, row, column, value)                                                             \
+    do {                                                                                                                 \
+        assert((row) < (grid).SIZE);                                                                                     \
+        assert((column) < (grid).SIZE);                                                                                  \
+        assert((value) <= (grid).SIZE);                                                                                  \
+        (grid)._isColumnFree[at2d((grid).SIZE + 1, (column), (value))] = (isFree);                                       \
+        (grid)._isRowFree[at2d((grid).SIZE + 1, (row), (value))] = (isFree);                                             \
+        (grid)._isBlockFree[at3d((grid).N, (grid).SIZE + 1, (row) / (grid).N, (column) / (grid).N, (value))] = (isFree); \
     } while (0)
 
 /// @brief Gets the axis index (a row or column number) of the start of the block containing the given index.
@@ -41,7 +41,7 @@
 // This solutions is considerably faster than the naive alternative (iterating over cells)
 // But it comes at a price : we must make sure that the state of candidates in the grid and the "_is*Free" arrays are synchronized from the start of the resolution to the backtracking call.
 // For this we use the grid_markValueFree macro
-#define grid_possible(grid, row, column, value)                         \
+#define grid_possible(grid, row, column, value)                     \
     ((grid)._isColumnFree[at2d((grid).SIZE + 1, (column), (value))] \
         && (grid)._isRowFree[at2d((grid).SIZE + 1, (row), (value))] \
         && (grid)._isBlockFree[at3d((grid).N, (grid).SIZE + 1, (row) / (grid).N, (column) / (grid).N, (value))])
@@ -75,9 +75,6 @@ void grid_write(tGrid const *grid, FILE *outStream);
 /// @brief Frees a grid.
 /// @param grid in/out: the grid to free
 void grid_free(tGrid *grid);
-
-// The functions that affect the value of the cells are not defined in tCell because they need the coordinates of the cell on the grid.
-// These coordinates allow for grid_possible to have a complexity of O(1), which represents a substantial performance gain.
 
 /// @brief Removes a candidate from a cell of the grid and sets it as the cell's value if it's the last one.
 /// @param grid in/out: the grid

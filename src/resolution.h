@@ -74,8 +74,8 @@ bool technique_nakedPair(tGrid *grid, tIntSize row, tIntSize column);
 /// @param cell in: the cell to check
 /// @return Whether the cell is a naked pair cell
 /// @remark Used in the naked pair technique.
-#define technique_nakedPair_isPairCell(cell, pair)      \
-    (cell_candidate_count(cell) == 2                    \
+#define technique_nakedPair_isPairCell(cell, pair)     \
+    (cell_candidate_count(cell) == 2                   \
         && cell_hasCandidate(cell, pair.candidates[0]) \
         && cell_hasCandidate(cell, pair.candidates[1]))
 

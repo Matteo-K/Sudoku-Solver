@@ -1,12 +1,17 @@
+/** @file
+ * @brief Memory debugger implementation
+ * @author 5cover, Matteo-K
+ */
+
 #include "memdbg.h"
 #include "const.h"
 #include "utils.h"
 #include <inttypes.h>
 #include <signal.h>
-#include <stdbool.h>
 #include <stdarg.h>
+#include <stdbool.h>
 
-#ifdef MEMDBG_ENABLE
+#ifndef NDEBUG
 
 #undef malloc
 #undef calloc
@@ -14,6 +19,12 @@
 
 #define STB_DS_IMPLEMENTATION
 #include "stb/ds.h"
+
+#ifdef MEMBDG_VERBOSE
+#define verbose
+#else
+#define verbose __attribute__((unused))
+#endif
 
 typedef enum {
     AM_malloc,
@@ -41,11 +52,28 @@ static AllocationsMapItem *gs_allocations_map;
 
 static bool gs_initialized = false;
 
-#ifdef MEMBDG_VERBOSE
-#define verbose
-#else
-#define verbose __attribute__((unused))
-#endif
+static void memdbg_exit(void)
+{
+    // Check that everything has been freed
+    bool foundUnfreedAlloc = false;
+    for (size_t i = 0; i < hmlenu(gs_allocations_map); ++i) {
+        Allocation alloc = gs_allocations_map[i].value;
+        if (alloc.status != AS_freed) {
+            foundUnfreedAlloc = true;
+            fprintf(stderr, "! Allocation %zu unfreed at exit (%s)\n", i, alloc.comment);
+        }
+    }
+
+    if (foundUnfreedAlloc) {
+        dbg_fail("Unfreed allocations have been found.");
+    }
+
+    // Cleanup
+    for (size_t i = 0; i < hmlenu(gs_allocations_map); ++i) {
+        free(gs_allocations_map[i].value.comment);
+    }
+    hmfree(gs_allocations_map);
+}
 
 static void signalHandler(int sigid)
 {
@@ -61,6 +89,7 @@ void lazyInit(void)
 {
     if (!gs_initialized) {
         signal(SIGABRT, signalHandler);
+        atexit(memdbg_exit);
     }
     gs_initialized = true;
 }
@@ -111,12 +140,13 @@ void dbg_free(char const *file, int line, void *ptr)
         item->value.status = AS_freed;
     } else {
         fprintf(stderr, "%s:%d: memdbg: free(%p)\n", file, line, ptr);
-        dbg_fail("!! Tried to free an invalid pointer: %p", ptr);
+        dbg_fail("Tried to free an invalid pointer: %p", ptr);
     }
 }
 
 void *check_alloc(void *mallocResult, char const *fmt_allocComment, ...)
 {
+    lazyInit();
     va_list args;
     va_start(args, fmt_allocComment);
 
@@ -147,75 +177,59 @@ void *check_alloc(void *mallocResult, char const *fmt_allocComment, ...)
     va_end(args);
 
     perform_emergencyMemoryCleanup();
-    exit(EXIT_MALLOC_FAILED);
-}
 
-void memdbg_cleanup(void)
-{
-    for (size_t i = 0; i < hmlenu(gs_allocations_map); ++i) {
-        free(gs_allocations_map[i].value.comment);
-    }
-    hmfree(gs_allocations_map);
+    exit(EXIT_MALLOC_FAILED);
 }
 
 void dbg_print_allocations(FILE *outStream)
 {
+    lazyInit();
 #define STR_AS_ALLOCATED "allocated"
 #define STR_AS_FREED "freed"
 
 #define STR_AM_MALLOC "malloc"
 #define STR_AM_CALLOC "calloc"
 
+#define COL_HEAD_INDEX "#"
 #define COL_HEAD_STATUS "status"
 #define COL_HEAD_PTR "ptr"
 #define COL_HEAD_METHOD "method"
 #define COL_HEAD_SIZE "size (bytes)"
 #define COL_HEAD_COMMENT "comment"
 
+#define COL_LEN_INDEX (digitCount(hmlenu(gs_allocations_map) - 1, 10))
 #define COL_LEN_STATUS ((int)max(sizeof COL_HEAD_STATUS, max(sizeof STR_AS_FREED, sizeof STR_AS_ALLOCATED)) - 1)
 #define COL_LEN_PTR ((int)sizeof(void *) + 4)
 #define COL_LEN_METHOD ((int)max(sizeof COL_HEAD_METHOD, max(sizeof STR_AM_MALLOC, sizeof STR_AM_CALLOC)) - 1)
 #define COL_LEN_SIZE ((int)sizeof COL_HEAD_SIZE - 1)
 
     // Header
-    fprintf(outStream, "%*s | %*s | %*s | %*s | %s\n",
+    fprintf(outStream, "%*s | %*s | %*s | %*s | %*s | %s\n",
+        COL_LEN_INDEX, COL_HEAD_INDEX,
         COL_LEN_STATUS, COL_HEAD_STATUS,
         COL_LEN_METHOD, COL_HEAD_METHOD,
         COL_LEN_SIZE, COL_HEAD_SIZE,
         COL_LEN_PTR, COL_HEAD_PTR,
         COL_HEAD_COMMENT);
 
+    size_t freedCount = 0, allocatedCount = 0;
     for (size_t i = 0; i < hmlenu(gs_allocations_map); ++i) {
         Allocation alloc = gs_allocations_map[i].value;
+
+        allocatedCount += alloc.status == AS_allocated;
+        freedCount += alloc.status == AS_freed;
+
         void *ptr = gs_allocations_map[i].key;
 
-        fprintf(outStream, "%*s | %*s | %*zu | %.*" PRIxPTR " | %s\n",
+        fprintf(outStream, "%*zu | %*s | %*s | %*zu | %.*" PRIxPTR " | %s\n",
+            COL_LEN_INDEX, i,
             COL_LEN_STATUS, alloc.status == AS_freed ? STR_AS_FREED : STR_AS_ALLOCATED,
             COL_LEN_METHOD, alloc.method == AM_malloc ? STR_AM_MALLOC : STR_AM_CALLOC,
             COL_LEN_SIZE, alloc.size,
             COL_LEN_PTR, (intptr_t)ptr,
             alloc.comment);
     }
-    fprintf(outStream, "%zu allocations\n", hmlen(gs_allocations_map));
+    fprintf(outStream, "%zu allocations (%zu currently allocated, %zu freed)\n", hmlen(gs_allocations_map), allocatedCount, freedCount);
 }
-
-/*
-
-idea:  make a map and map allocated ptrs to const allocation
-
-then we can display it instead of the raw pointer.
-and then we can have a function dbg_print_allocations_table(void) that prints as such:
-
-status  | ptr          | method | size | comment
-FREED   | 0x0008945613 | malloc | 18   | grid cell 0,1
-ALLOCED | 0x0008945613 | calloc | 1024 | grid
-
-purpose : we can see which allocations have been made at any point
-also maybe we can use signals to check if everything has been freed on exit.
-
-also maybe we could make dbg_[mc]alloc artificially return NULL to test error handling.
-
-(lazy initialize the map with a macro so we do not need a dedicated initialization function)
-*/
 
 #endif // MEMDBG_ENABLE

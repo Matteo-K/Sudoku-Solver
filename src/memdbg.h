@@ -1,3 +1,19 @@
+/** @file
+ * @brief Memory debugger header
+ * @author 5cover
+ *
+ * This memory debugger allow seeing which allocations have been made at any point in the program.
+ * It checks if everytying has been freed on exit.
+ *
+ * Current allocations can be printed in a table as such:
+ * status    | ptr          | method | size | comment
+ * freed     | 0x0008945613 | malloc | 18   | grid cell 0,1
+ * allocated | 0x0008965431 | calloc | 1024 | grid
+ *
+ * Ideas for more features:
+ * - Make memory allocation functions (calloc, malloc) articifially return null to test error handling.
+ */
+
 #ifndef MEMDBG_H
 #define MEMDBG_H
 
@@ -11,13 +27,16 @@
 #define attr_malloc
 #endif
 
+/// @brief Integer: an exit code for when a memory allocation fails.
 #define EXIT_MALLOC_FAILED (-1)
 
+/// @brief Aborts the program with a debug message.
 #define dbg_fail(fmt_msg, ...)                                \
     do {                                                      \
+        fputs("!! ", stderr);                                 \
         fprintf(stderr, (fmt_msg)__VA_OPT__(, ) __VA_ARGS__); \
         putc('\n', stderr);                                   \
-        abort();                                               \
+        abort();                                              \
     } while (0)
 
 #ifdef NDEBUG
@@ -25,11 +44,7 @@
 // Disable memory allocation checks.
 #define check_alloc(mallocResult, ...) (mallocResult)
 
-#define memdbg_cleanup() ;
-
 #else
-
-#define MEMDBG_ENABLE
 
 /// @brief Prints information about the state of the heap.
 /// @param outStream in: the stream to print to.
@@ -37,11 +52,8 @@ void dbg_print_allocations(FILE *outStream);
 
 /// @brief Performs an emergency full memory cleanup.
 /// @remark This function is called just before exiting in @ref exit_mallocFailed, in order to shutdown with the memory freed.
-/// @remark This function must be implemented by the client, considering that it may be called at any point in the program.
+/// @remark This function must be implemented by the client considering that it may be called at any point in the program.
 void perform_emergencyMemoryCleanup(void);
-
-/// @brief Cleans up the memdbg library.
-void memdbg_cleanup(void);
 
 /// @brief Checks that an allocation succeeded and adds a comment to it for memory debugging
 /// @param mallocResult in: result of the memory allocation
@@ -76,6 +88,6 @@ void *dbg_calloc(char const *file, int line, size_t nmemb, size_t size) attr_mal
 #define calloc(nmemb, size) dbg_calloc(__FILE__, __LINE__, nmemb, size)
 #define free(size) dbg_free(__FILE__, __LINE__, size)
 
-#endif
+#endif // NDEBUG
 
 #endif // MEMDBG_H

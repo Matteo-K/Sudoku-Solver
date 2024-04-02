@@ -20,7 +20,7 @@
 #define PAIR_SIZE 2
 
 /// @brief Defines that the memory debugger should give verbose output.
-//#define MEMDBG_VERBOSE
+// #define MEMDBG_VERBOSE
 
 /* Display character macros */
 

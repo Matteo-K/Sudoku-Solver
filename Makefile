@@ -1,6 +1,6 @@
-# Number of times to call the program when timing
 CC = gcc-12
 
+# Number of times to execute the program when timing
 int_timingIterations = 200
 
 #todo: -fprofile-use

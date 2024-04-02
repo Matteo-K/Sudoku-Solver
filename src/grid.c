@@ -30,6 +30,7 @@ int grid_load(FILE *inStream, tGrid *g)
     uint32_t *gridValues = check_alloc(array2d_malloc(gridValues, g->SIZE, g->SIZE), "gridValues");
 
     if (fread(gridValues, sizeof *gridValues, g->SIZE * g->SIZE, inStream) != g->SIZE * g->SIZE) {
+        free(gridValues);
         return ERROR_INVALID_DATA;
     }
 

@@ -1,6 +1,6 @@
 # Sudone
 
-Optimized Linux command-line Sudoku solver.
+An optimized Linux command-line Sudoku solver.
 
 Created by [Matteo-K](https://github.com/Matteo-K) and [Scover](https://github.com/5cover) (see [license](LICENSE)).
 

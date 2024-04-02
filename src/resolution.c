@@ -216,7 +216,7 @@ int technique_hiddenSingleton_findUniqueCandidate(
         }
     }
 
-    dbg_fail("Impossible : unique candidate not found even though it was found earlier");
+    dbg_fail("Unreachable code bug : unique candidate not found even though it was found earlier");
 }
 
 bool technique_nakedPair(tGrid *grid, tIntSize row, tIntSize column)
@@ -468,4 +468,3 @@ bool technique_x_wing(tGrid *grid)
 
     return progress;
 }
-
