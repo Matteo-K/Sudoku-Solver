@@ -1,23 +1,24 @@
 # Sudone
 
-An optimized Linux command-line Sudoku solver.
+Sudone - an optimized Sudoku solver
+
+The input grid is read from standard input and the result is printed to standard output.
 
 Created by [Matteo-K](https://github.com/Matteo-K) and [Scover](https://github.com/5cover) (see [license](LICENSE)).
 
 ## Usage
 
-`sudone N -[sbh]`
+`sudone N`
 
-N : the grid size factor (usually 3 for regular Sudoku grids that have 9 rows and columns).
-The grid is read from standard input.
+N : grid size factor (usually 3 for regular Sudoku grids that have 9 rows and columns).
 
 ### Options
 
 Option|Description
 -|-
-`-s`|**Solve** the grid before printing it.
-`-b`|**Binary** (Sud format) grid output
-`-h`|Print **help** and exit.
+`-s`|*Solve* the grid before printing it.
+`-b`|*Binary* (Sud format) grid output
+`--help`|Print *help* and exit.
 
 ### Examples
 

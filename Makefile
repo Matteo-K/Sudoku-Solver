@@ -1,4 +1,4 @@
-CC = gcc-12
+CC = gcc
 
 # Number of times to execute the program when timing
 int_timingIterations = 200
