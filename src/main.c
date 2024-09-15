@@ -91,8 +91,7 @@ int main(int argc, char **argv)
     gs_grid = grid_create(N);
 
     // Load the grid
-    switch (grid_load(stdin, &gs_grid)) {
-    case ERROR_INVALID_DATA:
+    if (grid_load(stdin, &gs_grid) == ERROR_INVALID_DATA) {
         fprintf(stderr, PROGRAM_NAME ": the input is not a Sudoku grid of size N=%d.\n", gs_grid.N);
         return EXIT_INVALID_DATA;
     }
