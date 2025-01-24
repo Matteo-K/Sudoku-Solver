@@ -21,7 +21,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#ifdef __GNUC__
+#if defined __GNUC__ && !defined __clang__
 #define attr_malloc __attribute__((__malloc__, __malloc__(dbg_free, 3)))
 #else
 #define attr_malloc

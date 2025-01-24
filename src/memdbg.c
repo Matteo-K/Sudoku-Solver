@@ -4,7 +4,6 @@
  */
 
 #include "memdbg.h"
-#include "const.h"
 #include "utils.h"
 #include <inttypes.h>
 #include <signal.h>

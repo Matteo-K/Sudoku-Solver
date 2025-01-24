@@ -10,6 +10,7 @@
 #include "const.h"
 #include "grid.h"
 #include "memdbg.h"
+#include "tCell.h"
 #include "utils.h"
 
 tGrid grid_create(tIntN const N) {

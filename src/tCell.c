@@ -5,9 +5,7 @@
 
 #include <assert.h>
 #include <stdbool.h>
-#include <stdio.h>
 
-#include "const.h"
 #include "tCell.h"
 
 int cell_candidateAt(tCell const *cell, tIntSize n) {

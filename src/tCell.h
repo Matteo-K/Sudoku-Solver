@@ -6,7 +6,6 @@
 #ifndef T_CELL_H
 #define T_CELL_H
 
-#include "const.h"
 #include "types.h"
 
 // Using macros to maximize the performance of these simple functions and procedures called very frequently in the program.

@@ -8,7 +8,7 @@
 
 #include <stdio.h>
 
-#include "tCell.h"
+#include "types.h"
 
 // Using macros to maximize the performance of these simple functions called very frequently in the program.
 

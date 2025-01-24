@@ -5,12 +5,11 @@
 
 #include <assert.h>
 #include <stdbool.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 #include "grid.h"
 #include "memdbg.h"
+#include "tCell.h"
 #include "resolution.h"
 
 bool perform_simpleTechniques(tGrid *grid) {

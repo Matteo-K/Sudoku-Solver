@@ -13,6 +13,7 @@
 #include "grid.h"
 #include "memdbg.h"
 #include "resolution.h"
+#include "tCell.h"
 
 static tGrid gs_grid; // Automatically zero-initialized
 
