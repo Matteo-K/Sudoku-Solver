@@ -112,12 +112,12 @@ int main(int argc, char **argv) {
         }
 
         // Collect the positions of the remaining empty cells for backtracking
-        tPosition *emptyCellPositions = check_alloc(array_malloc(emptyCellPositions, gs_grid.SIZE * gs_grid.SIZE), "empty cell positions");
+        tPosition *emptyCellPositions = check_alloc(array_malloc(emptyCellPositions, grid_size(gs_grid) * grid_size(gs_grid)), "empty cell positions");
 
         int emptyCellCount = 0;
 
-        for (tIntSize r = 0; r < gs_grid.SIZE; r++) {
-            for (tIntSize c = 0; c < gs_grid.SIZE; c++) {
+        for (tIntSize r = 0; r < grid_size(gs_grid); r++) {
+            for (tIntSize c = 0; c < grid_size(gs_grid); c++) {
                 if (!cell_hasValue(grid_cellAt(gs_grid, r, c))) {
                     emptyCellPositions[emptyCellCount++] = (tPosition) { .row = r, .column = c };
                 }

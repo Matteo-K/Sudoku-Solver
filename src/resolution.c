@@ -16,8 +16,8 @@ bool perform_simpleTechniques(tGrid *grid) {
     bool progress = false;
     tCell *cell;
 
-    for (tIntSize r = 0; r < grid->SIZE; r++) {
-        for (tIntSize c = 0; c < grid->SIZE; c++) {
+    for (tIntSize r = 0; r < grid_size(*grid); r++) {
+        for (tIntSize c = 0; c < grid_size(*grid); c++) {
             // Executing the techniques in order of increasing complexity.
             // As soon as the value of the cell is defined, we move on to the next one.
 
@@ -59,7 +59,7 @@ bool technique_backtracking(tGrid *grid, tPosition *emptyCellPositions, tIntSize
 
     tPosition pos = emptyCellPositions[iCellPosition];
 
-    for (tIntSize value = 1; value <= grid->SIZE; value++) {
+    for (tIntSize value = 1; value <= grid_size(*grid); value++) {
         if (grid_possible(*grid, pos.row, pos.column, value)) {
             // assuming that the cell contains this value,
             grid_markValueFree(false, *grid, pos.row, pos.column, value);
@@ -144,7 +144,7 @@ bool technique_hiddenSingleton(tGrid *grid, tIntSize row, tIntSize column) {
     if ((candidate = technique_hiddenSingleton_findUniqueCandidate(
              grid,
              row, row + 1,
-             0, grid->SIZE,
+             0, grid_size(*grid),
              &candidatePos))
         != 0) {
         grid_cell_provideValue(grid, candidatePos.row, candidatePos.column, candidate);
@@ -158,7 +158,7 @@ bool technique_hiddenSingleton(tGrid *grid, tIntSize row, tIntSize column) {
     // Column
     if ((candidate = technique_hiddenSingleton_findUniqueCandidate(
              grid,
-             0, grid->SIZE,
+             0, grid_size(*grid),
              column, column + 1,
              &candidatePos))
         != 0) {
@@ -176,12 +176,12 @@ int technique_hiddenSingleton_findUniqueCandidate(
     tIntSize rStart, tIntSize rEnd,
     tIntSize cStart, tIntSize cEnd,
     tPosition *candidatePosition) {
-    tIntSize *candidateCounts = check_alloc(array_calloc(candidateCounts, grid->SIZE + 1), "candidate counts array");
+    tIntSize *candidateCounts = check_alloc(array_calloc(candidateCounts, grid_size(*grid) + 1), "candidate counts array");
 
     for (tIntSize r = rStart; r < rEnd; r++) {
         for (tIntSize c = cStart; c < cEnd; c++) {
             tCell cell = grid_cellAt(*grid, r, c);
-            for (tIntSize candidate = 1; candidate <= grid->SIZE; candidate++) {
+            for (tIntSize candidate = 1; candidate <= grid_size(*grid); candidate++) {
                 candidateCounts[candidate] += cell_hasCandidate(cell, candidate);
             }
         }
@@ -189,14 +189,14 @@ int technique_hiddenSingleton_findUniqueCandidate(
 
     // Search for the unique candidate
     tIntSize candidate = 1;
-    while (candidate <= grid->SIZE && candidateCounts[candidate] != 1) {
+    while (candidate <= grid_size(*grid) && candidateCounts[candidate] != 1) {
         candidate++;
     }
 
     free(candidateCounts);
 
     // If it hasn't been found
-    if (candidate == grid->SIZE + 1) {
+    if (candidate == grid_size(*grid) + 1) {
         return 0;
     }
 
@@ -271,13 +271,13 @@ bool technique_hiddenPair(tGrid *grid, tIntSize row, tIntSize column) {
     progress |= (cell_candidate_count(*cellRowColumn) >= 2
                     && technique_hiddenPair_findPair(grid,
                         row, row + 1,
-                        0, grid->SIZE,
+                        0, grid_size(*grid),
                         pairCellPositions, candidates))
              && technique_hiddenPair_removePairCells(grid, pairCellPositions, candidates);
     // Column
     progress |= (cell_candidate_count(*cellRowColumn) >= 2
                     && technique_hiddenPair_findPair(grid,
-                        0, grid->SIZE,
+                        0, grid_size(*grid),
                         column, column + 1,
                         pairCellPositions, candidates))
              && technique_hiddenPair_removePairCells(grid, pairCellPositions, candidates);
@@ -294,12 +294,12 @@ bool technique_hiddenPair_findPair(
 
     assert(cell_candidate_count(firstPairCell) >= 2);
 
-    for (candidates[0] = 1; candidates[0] <= grid->SIZE; candidates[0]++) {
+    for (candidates[0] = 1; candidates[0] <= grid_size(*grid); candidates[0]++) {
         if (!cell_hasCandidate(firstPairCell, candidates[0])) {
             continue;
         }
 
-        for (candidates[1] = candidates[0] + 1; candidates[1] <= grid->SIZE; candidates[1]++) {
+        for (candidates[1] = candidates[0] + 1; candidates[1] <= grid_size(*grid); candidates[1]++) {
             if (!cell_hasCandidate(firstPairCell, candidates[1])) {
                 continue;
             }
@@ -366,7 +366,7 @@ bool technique_hiddenPair_removePairCells(
     for (tIntSize iPos = 0; iPos < PAIR_SIZE; ++iPos) {
         tPosition pos = pairCellPositions[iPos];
         // remove all its candidates
-        for (tIntSize candidate = 1; candidate <= grid->SIZE; ++candidate) {
+        for (tIntSize candidate = 1; candidate <= grid_size(*grid); ++candidate) {
             // except those forming the pair
             progress |= candidate != candidates[0]
                      && candidate != candidates[1]
@@ -387,13 +387,13 @@ bool technique_x_wing(tGrid *grid) {
     |   |
     C---D
     ‾   ‾*/
-    for (tIntSize colAC = 0; colAC < grid->SIZE; colAC++) {
-        for (tIntSize colBD = colAC + 1; colBD < grid->SIZE; colBD++) {
-            for (tIntSize candidate = 1; candidate <= grid->SIZE; candidate++) {
+    for (tIntSize colAC = 0; colAC < grid_size(*grid); colAC++) {
+        for (tIntSize colBD = colAC + 1; colBD < grid_size(*grid); colBD++) {
+            for (tIntSize candidate = 1; candidate <= grid_size(*grid); candidate++) {
                 tIntSize rows[2];
                 tIntSize candidateInBothCount = 0;
                 tIntSize candidateCounts[2] = { 0 };
-                for (tIntSize row = 0; row < grid->SIZE; row++) {
+                for (tIntSize row = 0; row < grid_size(*grid); row++) {
                     bool colACHasCandidate = cell_hasCandidate(grid_cellAt(*grid, row, colAC), candidate);
                     bool colBDHasCandidate = cell_hasCandidate(grid_cellAt(*grid, row, colBD), candidate);
                     candidateCounts[0] += colACHasCandidate;
@@ -407,7 +407,7 @@ bool technique_x_wing(tGrid *grid) {
                 }
                 if (candidateInBothCount == 2 && candidateCounts[0] == 2 && candidateCounts[1] == 2) {
                     // eliminate the candidate from the rows (AB) and (CD).
-                    for (tIntSize c = 0; c < grid->SIZE; c++) {
+                    for (tIntSize c = 0; c < grid_size(*grid); c++) {
                         // do not remove the candidate from the cells that form the X.
                         progress |= c != colAC && c != colBD && grid_cell_removeCandidate(grid, rows[0], c, candidate);
                         progress |= c != colAC && c != colBD && grid_cell_removeCandidate(grid, rows[1], c, candidate);
@@ -423,13 +423,13 @@ bool technique_x_wing(tGrid *grid) {
     (A---B)
      |   |
     (C---D)*/
-    for (tIntSize rowAB = 0; rowAB < grid->SIZE; rowAB++) {
-        for (tIntSize rowCD = rowAB + 1; rowCD < grid->SIZE; rowCD++) {
-            for (tIntSize candidate = 1; candidate <= grid->SIZE; candidate++) {
+    for (tIntSize rowAB = 0; rowAB < grid_size(*grid); rowAB++) {
+        for (tIntSize rowCD = rowAB + 1; rowCD < grid_size(*grid); rowCD++) {
+            for (tIntSize candidate = 1; candidate <= grid_size(*grid); candidate++) {
                 tIntSize columns[2];
                 tIntSize candidateInBothCount = 0;
                 tIntSize candidateCounts[2] = { 0 };
-                for (tIntSize col = 0; col < grid->SIZE; col++) {
+                for (tIntSize col = 0; col < grid_size(*grid); col++) {
                     bool rowABHasCandidate = cell_hasCandidate(grid_cellAt(*grid, rowAB, col), candidate);
                     bool rowCDHasCandidate = cell_hasCandidate(grid_cellAt(*grid, rowCD, col), candidate);
                     candidateCounts[0] += rowABHasCandidate;
@@ -443,7 +443,7 @@ bool technique_x_wing(tGrid *grid) {
                 }
                 if (candidateInBothCount == 2 && candidateCounts[0] == 2 && candidateCounts[1] == 2) {
                     // elmininate the candidate from the columns (AC) and (BD).
-                    for (tIntSize r = 0; r < grid->SIZE; r++) {
+                    for (tIntSize r = 0; r < grid_size(*grid); r++) {
                         // do not remove the candidate from the cells that form the X.
                         progress |= r != rowAB && r != rowCD && grid_cell_removeCandidate(grid, r, columns[0], candidate);
                         progress |= r != rowAB && r != rowCD && grid_cell_removeCandidate(grid, r, columns[1], candidate);

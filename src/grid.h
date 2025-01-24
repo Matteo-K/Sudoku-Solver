@@ -12,17 +12,19 @@
 
 // Using macros to maximize the performance of these simple functions called very frequently in the program.
 
-#define grid_cellAt(grid, row, column) (grid).cells[at2d((grid).SIZE, (row), (column))]
+#define grid_size(grid) ((grid).N * (grid).N)
+
+#define grid_cellAt(grid, row, column) (grid).cells[at2d(grid_size(grid), (row), (column))]
 #define grid_cellAtPos(grid, pos) grid_cellAt(grid, pos.row, pos.column)
 /// @brief Defines whether a value is free or not at a position on the grid.
 #define grid_markValueFree(isFree, grid, row, column, value)                                                             \
     do {                                                                                                                 \
-        assert((row) < (grid).SIZE);                                                                                     \
-        assert((column) < (grid).SIZE);                                                                                  \
-        assert((value) <= (grid).SIZE);                                                                                  \
-        (grid)._isColumnFree[at2d((grid).SIZE + 1, (column), (value))] = (isFree);                                       \
-        (grid)._isRowFree[at2d((grid).SIZE + 1, (row), (value))] = (isFree);                                             \
-        (grid)._isBlockFree[at3d((grid).N, (grid).SIZE + 1, (row) / (grid).N, (column) / (grid).N, (value))] = (isFree); \
+        assert((row) < grid_size(grid));                                                                                     \
+        assert((column) < grid_size(grid));                                                                                  \
+        assert((value) <= grid_size(grid));                                                                                  \
+        (grid)._isColumnFree[at2d(grid_size(grid) + 1, (column), (value))] = (isFree);                                       \
+        (grid)._isRowFree[at2d(grid_size(grid) + 1, (row), (value))] = (isFree);                                             \
+        (grid)._isBlockFree[at3d((grid).N, grid_size(grid) + 1, (row) / (grid).N, (column) / (grid).N, (value))] = (isFree); \
     } while (0)
 
 /// @brief Gets the axis index (a row or column number) of the start of the block containing the given index.
@@ -42,9 +44,9 @@
 // But it comes at a price : we must make sure that the state of candidates in the grid and the "_is*Free" arrays are synchronized from the start of the resolution to the backtracking call.
 // For this we use the grid_markValueFree macro
 #define grid_possible(grid, row, column, value)                     \
-    ((grid)._isColumnFree[at2d((grid).SIZE + 1, (column), (value))] \
-        && (grid)._isRowFree[at2d((grid).SIZE + 1, (row), (value))] \
-        && (grid)._isBlockFree[at3d((grid).N, (grid).SIZE + 1, (row) / (grid).N, (column) / (grid).N, (value))])
+    ((grid)._isColumnFree[at2d(grid_size(grid) + 1, (column), (value))] \
+        && (grid)._isRowFree[at2d(grid_size(grid) + 1, (row), (value))] \
+        && (grid)._isBlockFree[at3d((grid).N, grid_size(grid) + 1, (row) / (grid).N, (column) / (grid).N, (value))])
 
 /// @brief Counts the number of possible values for a cell.
 /// @param grid in: the grid
@@ -54,7 +56,7 @@
 /// @return The amount of values for which @ref grid_possible returns @c true.
 #define grid_cellPossibleValuesCount(grid, row, column, outVarName) \
     tIntSize outVarName = 0;                                        \
-    for (tIntSize val = 1; val <= (grid).SIZE; val++) {             \
+    for (tIntSize val = 1; val <= grid_size(grid); val++) {             \
         outVarName += grid_possible((grid), (row), (column), val);  \
     }
 

@@ -58,10 +58,6 @@ typedef struct {
     /// @remark Dimensions: [rowIndex][columnIndex]
     tCell *cells;
 
-    /// @brief Grid side.
-    /// @remark This member is semantically constant and should not be reassigned.
-    tIntSize SIZE;
-
     /// @brief Grid size factor.
     /// @remark This member is semantically constant and should not be reassigned.
     tIntN N;
