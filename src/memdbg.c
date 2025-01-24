@@ -181,27 +181,27 @@ void dbg_print_allocations(FILE *outStream) {
 #define STR_AM_MALLOC "malloc"
 #define STR_AM_CALLOC "calloc"
 
-#define COL_HEAD_INDEX "#"
-#define COL_HEAD_STATUS "status"
-#define COL_HEAD_PTR "ptr"
-#define COL_HEAD_METHOD "method"
-#define COL_HEAD_SIZE "size (bytes)"
-#define COL_HEAD_COMMENT "comment"
+#define TH_INDEX "#"
+#define TH_STATUS "status"
+#define TH_PTR "ptr"
+#define TH_METHOD "method"
+#define TH_SIZE "size (bytes)"
+#define TH_COMMENT "comment"
 
 #define COL_LEN_INDEX (digitCount(hmlenu(gs_allocations_map) - 1, 10))
-#define COL_LEN_STATUS ((int)max(sizeof COL_HEAD_STATUS, max(sizeof STR_AS_FREED, sizeof STR_AS_ALLOCATED)) - 1)
+#define COL_LEN_STATUS ((int)max(sizeof TH_STATUS, max(sizeof STR_AS_FREED, sizeof STR_AS_ALLOCATED)) - 1)
 #define COL_LEN_PTR ((int)sizeof(void *) + 4)
-#define COL_LEN_METHOD ((int)max(sizeof COL_HEAD_METHOD, max(sizeof STR_AM_MALLOC, sizeof STR_AM_CALLOC)) - 1)
-#define COL_LEN_SIZE ((int)sizeof COL_HEAD_SIZE - 1)
+#define COL_LEN_METHOD ((int)max(sizeof TH_METHOD, max(sizeof STR_AM_MALLOC, sizeof STR_AM_CALLOC)) - 1)
+#define COL_LEN_SIZE ((int)sizeof TH_SIZE - 1)
 
     // Header
     fprintf(outStream, "%*s | %*s | %*s | %*s | %*s | %s\n",
-        COL_LEN_INDEX, COL_HEAD_INDEX,
-        COL_LEN_STATUS, COL_HEAD_STATUS,
-        COL_LEN_METHOD, COL_HEAD_METHOD,
-        COL_LEN_SIZE, COL_HEAD_SIZE,
-        COL_LEN_PTR, COL_HEAD_PTR,
-        COL_HEAD_COMMENT);
+        COL_LEN_INDEX, TH_INDEX,
+        COL_LEN_STATUS, TH_STATUS,
+        COL_LEN_METHOD, TH_METHOD,
+        COL_LEN_SIZE, TH_SIZE,
+        COL_LEN_PTR, TH_PTR,
+        TH_COMMENT);
 
     size_t freedCount = 0, allocatedCount = 0;
     for (size_t i = 0; i < hmlenu(gs_allocations_map); ++i) {
