@@ -6,7 +6,7 @@ int_timingIterations = 200
 #todo: -fprofile-use
 
 clfags_lib = -lm
-cflags = -Wall -Wextra -fmacro-prefix-map=$(dir_src)=.
+cflags = -Wall -Wextra -fmacro-prefix-map=$(dir_src)=. $(cf)
 cflags_debug = $(cflags) -g -Og -fsanitize=address -fsanitize=signed-integer-overflow -fsanitize=leak
 cflags_release = $(cflags) -O0 -DNDEBUG # NDEBUG disables assertions
 
@@ -27,6 +27,8 @@ file_exe_release = $(dir_bin)/release_$(str_exeName)
 file_exe_debug = $(dir_bin)/debug_$(str_exeName)
 file_exe_gprof = $(dir_bin)/gprof_$(str_exeName)
 file_exe_gcov = $(dir_src)/gcov_$(str_exeName)
+
+all: $(file_exe_debug)
 
 $(dir_bin):
 	mkdir -p $(dir_bin)
