@@ -13,8 +13,7 @@
 #include "memdbg.h"
 #include "resolution.h"
 
-bool perform_simpleTechniques(tGrid *grid)
-{
+bool perform_simpleTechniques(tGrid *grid) {
     bool progress = false;
     tCell *cell;
 
@@ -44,8 +43,7 @@ bool perform_simpleTechniques(tGrid *grid)
     return progress;
 }
 
-bool technique_backtracking(tGrid *grid, tPosition *emptyCellPositions, tIntSize emptyCellCount, tIntSize iCellPosition)
-{
+bool technique_backtracking(tGrid *grid, tPosition *emptyCellPositions, tIntSize emptyCellCount, tIntSize iCellPosition) {
     // This technique does not use candidates but value presence arrays.
     // The reason is that synchronizing the candidates between recursive calls requires loops.
     // While for the value arrays it is a simple boolean that indicates whether a value is present in a group (row, block or column).
@@ -83,8 +81,7 @@ bool technique_backtracking(tGrid *grid, tPosition *emptyCellPositions, tIntSize
     return false;
 }
 
-void technique_backtracking_swap_cells(tGrid const *grid, tPosition *emptyCellPositions, tIntSize emptyCellCount, tIntSize iHere)
-{
+void technique_backtracking_swap_cells(tGrid const *grid, tPosition *emptyCellPositions, tIntSize emptyCellCount, tIntSize iHere) {
     assert(iHere < emptyCellCount);
 
     tPosition pos = emptyCellPositions[iHere];
@@ -108,8 +105,7 @@ void technique_backtracking_swap_cells(tGrid const *grid, tPosition *emptyCellPo
     emptyCellPositions[iMin] = tmp;
 }
 
-bool technique_nakedSingleton(tGrid *grid, tIntSize row, tIntSize column)
-{
+bool technique_nakedSingleton(tGrid *grid, tIntSize row, tIntSize column) {
     bool progress = false;
 
     tCell *cell = &grid_cellAt(*grid, row, column);
@@ -125,8 +121,7 @@ bool technique_nakedSingleton(tGrid *grid, tIntSize row, tIntSize column)
     return progress;
 }
 
-bool technique_hiddenSingleton(tGrid *grid, tIntSize row, tIntSize column)
-{
+bool technique_hiddenSingleton(tGrid *grid, tIntSize row, tIntSize column) {
     tPosition candidatePos;
     int candidate;
     bool progress = false;
@@ -181,8 +176,7 @@ int technique_hiddenSingleton_findUniqueCandidate(
     tGrid const *grid,
     tIntSize rStart, tIntSize rEnd,
     tIntSize cStart, tIntSize cEnd,
-    tPosition *candidatePosition)
-{
+    tPosition *candidatePosition) {
     tIntSize *candidateCounts = check_alloc(array_calloc(candidateCounts, grid->SIZE + 1), "candidate counts array");
 
     for (tIntSize r = rStart; r < rEnd; r++) {
@@ -210,7 +204,7 @@ int technique_hiddenSingleton_findUniqueCandidate(
     for (tIntSize r = rStart; r < rEnd; r++) {
         for (tIntSize c = cStart; c < cEnd; c++) {
             if (cell_hasCandidate(grid_cellAt(*grid, r, c), candidate)) {
-                *candidatePosition = (tPosition){.row = r, .column = c};
+                *candidatePosition = (tPosition) { .row = r, .column = c };
                 return candidate;
             }
         }
@@ -219,8 +213,7 @@ int technique_hiddenSingleton_findUniqueCandidate(
     dbg_fail("Unreachable code bug : unique candidate not found even though it was found earlier");
 }
 
-bool technique_nakedPair(tGrid *grid, tIntSize row, tIntSize column)
-{
+bool technique_nakedPair(tGrid *grid, tIntSize row, tIntSize column) {
     bool progress = false;
 
     tCell *cellRowColumn = &grid_cellAt(*grid, row, column);
@@ -229,10 +222,10 @@ bool technique_nakedPair(tGrid *grid, tIntSize row, tIntSize column)
         tIntSize const blockRow = grid_blockIndex(*grid, row);
         tIntSize const blockCol = grid_blockIndex(*grid, column);
 
-        tPair2 pair = (tPair2){
+        tPair2 pair = (tPair2) {
             .candidates = {
                 cell_candidateAt(cellRowColumn, 1),
-                cell_candidateAt(cellRowColumn, 2)},
+                cell_candidateAt(cellRowColumn, 2) },
             .count = 1,
         };
 
@@ -258,9 +251,8 @@ bool technique_nakedPair(tGrid *grid, tIntSize row, tIntSize column)
     return progress;
 }
 
-bool technique_hiddenPair(tGrid *grid, tIntSize row, tIntSize column)
-{
-    tPosition pairCellPositions[PAIR_SIZE] = {(tPosition){.row = row, .column = column}};
+bool technique_hiddenPair(tGrid *grid, tIntSize row, tIntSize column) {
+    tPosition pairCellPositions[PAIR_SIZE] = { (tPosition) { .row = row, .column = column } };
     tIntSize candidates[PAIR_SIZE];
     bool progress = false;
 
@@ -298,8 +290,7 @@ bool technique_hiddenPair_findPair(
     tGrid const *grid,
     tIntSize rStart, tIntSize rEnd,
     tIntSize cStart, tIntSize cEnd,
-    tPosition pairCellPositions[PAIR_SIZE], tIntSize candidates[PAIR_SIZE])
-{
+    tPosition pairCellPositions[PAIR_SIZE], tIntSize candidates[PAIR_SIZE]) {
     tCell firstPairCell = grid_cellAtPos(*grid, pairCellPositions[0]);
 
     assert(cell_candidate_count(firstPairCell) >= 2);
@@ -332,8 +323,7 @@ bool technique_hiddenPair_findPairCells(
     tGrid const *grid, tIntSize const candidates[PAIR_SIZE],
     tIntSize rStart, tIntSize rEnd,
     tIntSize cStart, tIntSize cEnd,
-    tPosition pairCellPositions[PAIR_SIZE])
-{
+    tPosition pairCellPositions[PAIR_SIZE]) {
     tIntSize nbPairCells = 1; // Count of cells found containing the pair (candidate1, candidate2).
     tIntSize nbPairCellsContainingOtherCandidates = 0;
 
@@ -351,7 +341,7 @@ bool technique_hiddenPair_findPairCells(
                 && cell_hasCandidate(cell, candidates[1])) {
                 nbPairCellsContainingOtherCandidates += cell_candidate_count(cell) > PAIR_SIZE;
                 if (nbPairCells < PAIR_SIZE) {
-                    pairCellPositions[nbPairCells] = (tPosition){.row = r, .column = c};
+                    pairCellPositions[nbPairCells] = (tPosition) { .row = r, .column = c };
                 }
                 nbPairCells++;
             }
@@ -371,8 +361,7 @@ bool technique_hiddenPair_findPairCells(
 bool technique_hiddenPair_removePairCells(
     tGrid *grid,
     tPosition const pairCellPositions[PAIR_SIZE],
-    tIntSize const candidates[PAIR_SIZE])
-{
+    tIntSize const candidates[PAIR_SIZE]) {
     bool progress = false;
     // For each cell containing the pair:
     for (tIntSize iPos = 0; iPos < PAIR_SIZE; ++iPos) {
@@ -388,8 +377,7 @@ bool technique_hiddenPair_removePairCells(
     return progress;
 }
 
-bool technique_x_wing(tGrid *grid)
-{
+bool technique_x_wing(tGrid *grid) {
     bool progress = false;
 
     // VERTICAL X-WING
@@ -405,7 +393,7 @@ bool technique_x_wing(tGrid *grid)
             for (tIntSize candidate = 1; candidate <= grid->SIZE; candidate++) {
                 tIntSize rows[2];
                 tIntSize candidateInBothCount = 0;
-                tIntSize candidateCounts[2] = {0};
+                tIntSize candidateCounts[2] = { 0 };
                 for (tIntSize row = 0; row < grid->SIZE; row++) {
                     bool colACHasCandidate = cell_hasCandidate(grid_cellAt(*grid, row, colAC), candidate);
                     bool colBDHasCandidate = cell_hasCandidate(grid_cellAt(*grid, row, colBD), candidate);
@@ -441,7 +429,7 @@ bool technique_x_wing(tGrid *grid)
             for (tIntSize candidate = 1; candidate <= grid->SIZE; candidate++) {
                 tIntSize columns[2];
                 tIntSize candidateInBothCount = 0;
-                tIntSize candidateCounts[2] = {0};
+                tIntSize candidateCounts[2] = { 0 };
                 for (tIntSize col = 0; col < grid->SIZE; col++) {
                     bool rowABHasCandidate = cell_hasCandidate(grid_cellAt(*grid, rowAB, col), candidate);
                     bool rowCDHasCandidate = cell_hasCandidate(grid_cellAt(*grid, rowCD, col), candidate);

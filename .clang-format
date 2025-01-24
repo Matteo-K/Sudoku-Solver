@@ -1,0 +1,22 @@
+---
+BasedOnStyle: WebKit
+AlignAfterOpenBracket: DontAlign
+AlignOperands: AlignAfterOperator
+AlignTrailingComments:
+  Kind: Always
+  OverEmptyLines: 1
+AllowShortBlocksOnASingleLine: Never
+AllowShortCaseLabelsOnASingleLine: true
+AllowShortEnumsOnASingleLine: true
+AllowShortIfStatementsOnASingleLine: WithoutElse
+BreakBeforeBinaryOperators: All
+BreakBeforeBraces: Attach
+ColumnLimit: 0
+ContinuationIndentWidth: 4
+IndentCaseLabels: false
+IndentWidth: 4
+InsertNewlineAtEOF: true
+PointerAlignment: Right
+TabWidth: 4
+---
+

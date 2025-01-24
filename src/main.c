@@ -16,14 +16,12 @@
 
 static tGrid gs_grid; // Automatically zero-initialized
 
-void perform_emergencyMemoryCleanup(void)
-{
+void perform_emergencyMemoryCleanup(void) {
     // It's always safe to call grid_free since the pointers inside tGrid and tCell are always either NULL or valid, thanks to static member auto initialization and grid_create.
     grid_free(&gs_grid);
 }
 
-static void print_help(void)
-{
+static void print_help(void) {
     puts("Sudone - an optimized Sudoku solver");
     puts("The input grid is read from standard input and the result is printed to standard output.");
     puts("");
@@ -40,20 +38,20 @@ static void print_help(void)
     puts("This is public domain software. Compiled on " __DATE__ ".");
 }
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
     bool opt_solve = false, opt_binary = false;
 
     // Parse command-line options
     {
         struct option longOptions[] = {
-            (struct option){
+            (struct option) {
                 .name = "help",
                 .has_arg = 0,
                 .flag = NULL,
                 .val = 'h',
             },
-            {0}};
+            { 0 }
+        };
 
         int opt;
         while ((opt = getopt_long(argc, argv, "sb", longOptions, NULL)) != -1) {
@@ -120,7 +118,7 @@ int main(int argc, char **argv)
         for (tIntSize r = 0; r < gs_grid.SIZE; r++) {
             for (tIntSize c = 0; c < gs_grid.SIZE; c++) {
                 if (!cell_hasValue(grid_cellAt(gs_grid, r, c))) {
-                    emptyCellPositions[emptyCellCount++] = (tPosition){.row = r, .column = c};
+                    emptyCellPositions[emptyCellCount++] = (tPosition) { .row = r, .column = c };
                 }
             }
         }

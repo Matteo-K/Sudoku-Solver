@@ -52,8 +52,7 @@ static AllocationsMapItem *gs_allocations_map;
 
 static bool gs_initialized = false;
 
-static void memdbg_exit(void)
-{
+static void memdbg_exit(void) {
     // Check that everything has been freed
     bool foundUnfreedAlloc = false;
     for (size_t i = 0; i < hmlenu(gs_allocations_map); ++i) {
@@ -75,8 +74,7 @@ static void memdbg_exit(void)
     hmfree(gs_allocations_map);
 }
 
-static void signalHandler(int sigid)
-{
+static void signalHandler(int sigid) {
     if (sigid == SIGABRT) {
 #ifdef MEMDBG_VERBOSE
         // Print allocations on abort
@@ -85,8 +83,7 @@ static void signalHandler(int sigid)
     }
 }
 
-void lazyInit(void)
-{
+void lazyInit(void) {
     if (!gs_initialized) {
         signal(SIGABRT, signalHandler);
         atexit(memdbg_exit);
@@ -94,15 +91,14 @@ void lazyInit(void)
     gs_initialized = true;
 }
 
-void *dbg_malloc(verbose char const *file, verbose int line, size_t size)
-{
+void *dbg_malloc(verbose char const *file, verbose int line, size_t size) {
     lazyInit();
     void *ptr = malloc(size);
 #ifdef MEMDBG_VERBOSE
     fprintf(stderr, "%s:%d: memdbg: malloc(%zu) -> %p\n", file, line, size, ptr);
 #endif
     hmput(gs_allocations_map, ptr,
-        ((Allocation){
+        ((Allocation) {
             .method = AM_malloc,
             .size = size,
             .status = AS_allocated,
@@ -111,15 +107,14 @@ void *dbg_malloc(verbose char const *file, verbose int line, size_t size)
     return ptr;
 }
 
-void *dbg_calloc(verbose char const *file, verbose int line, size_t nmemb, size_t size)
-{
+void *dbg_calloc(verbose char const *file, verbose int line, size_t nmemb, size_t size) {
     lazyInit();
     void *ptr = calloc(nmemb, size);
 #ifdef MEMDBG_VERBOSE
     fprintf(stderr, "%s:%d: memdbg: calloc(%zu, %zu) -> %p\n", file, line, nmemb, size, ptr);
 #endif
     hmput(gs_allocations_map, ptr,
-        ((Allocation){
+        ((Allocation) {
             .method = AM_malloc,
             .size = nmemb * size,
             .status = AS_allocated,
@@ -128,8 +123,7 @@ void *dbg_calloc(verbose char const *file, verbose int line, size_t nmemb, size_
     return ptr;
 }
 
-void dbg_free(char const *file, int line, void *ptr)
-{
+void dbg_free(char const *file, int line, void *ptr) {
     lazyInit();
     AllocationsMapItem *item = hmgetp_null(gs_allocations_map, ptr);
     if (item != NULL) {
@@ -144,8 +138,7 @@ void dbg_free(char const *file, int line, void *ptr)
     }
 }
 
-void *check_alloc(void *mallocResult, char const *fmt_allocComment, ...)
-{
+void *check_alloc(void *mallocResult, char const *fmt_allocComment, ...) {
     lazyInit();
     va_list args;
     va_start(args, fmt_allocComment);
@@ -181,8 +174,7 @@ void *check_alloc(void *mallocResult, char const *fmt_allocComment, ...)
     exit(EXIT_MALLOC_FAILED);
 }
 
-void dbg_print_allocations(FILE *outStream)
-{
+void dbg_print_allocations(FILE *outStream) {
     lazyInit();
 #define STR_AS_ALLOCATED "allocated"
 #define STR_AS_FREED "freed"

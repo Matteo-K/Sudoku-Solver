@@ -10,8 +10,7 @@
 #include "const.h"
 #include "tCell.h"
 
-int cell_candidateAt(tCell const *cell, tIntSize n)
-{
+int cell_candidateAt(tCell const *cell, tIntSize n) {
     assert(n <= cell_candidate_count(*cell));
 
     tIntSize candidate = 0;

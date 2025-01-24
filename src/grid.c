@@ -12,9 +12,8 @@
 #include "memdbg.h"
 #include "utils.h"
 
-tGrid grid_create(tIntN const N)
-{
-    return (tGrid){
+tGrid grid_create(tIntN const N) {
+    return (tGrid) {
         .N = N,
         .SIZE = N * N,
         .cells = NULL,
@@ -24,15 +23,17 @@ tGrid grid_create(tIntN const N)
     };
 }
 
-int grid_load(FILE *inStream, tGrid *g)
-{
+int grid_load(FILE *inStream, tGrid *g) {
+#define fail_invalid_data()        \
+    do {                           \
+        free(gridValues);          \
+        return ERROR_INVALID_DATA; \
+    } while (0);
+
     // As the .sud files only contain the grid values, we need a temporary integer grid to store them.
     uint32_t *gridValues = check_alloc(array2d_malloc(gridValues, g->SIZE, g->SIZE), "gridValues");
 
-    if (fread(gridValues, sizeof *gridValues, g->SIZE * g->SIZE, inStream) != g->SIZE * g->SIZE) {
-        free(gridValues);
-        return ERROR_INVALID_DATA;
-    }
+    if (fread(gridValues, sizeof *gridValues, g->SIZE * g->SIZE, inStream) != g->SIZE * g->SIZE) fail_invalid_data();
 
     // Allocate and initialize all cells to 0 (candidates array is NULL, no value, 0 candidates)
     g->cells = check_alloc(array2d_calloc(g->cells, g->SIZE, g->SIZE), "grid cells array");
@@ -57,6 +58,7 @@ int grid_load(FILE *inStream, tGrid *g)
                 "grid cell %d,%d hasCandidate array", r, c);
 
             if (value != 0) {
+                if (value > g->SIZE) fail_invalid_data();
                 cell->_value = value;
                 grid_markValueFree(false, *g, r, c, value);
             }
@@ -81,12 +83,10 @@ int grid_load(FILE *inStream, tGrid *g)
     }
 
     free(gridValues);
-
     return 0;
 }
 
-void grid_free(tGrid *grid)
-{
+void grid_free(tGrid *grid) {
     for (tIntSize r = 0; r < grid->SIZE; r++) {
         for (tIntSize c = 0; c < grid->SIZE; c++) {
             free(grid_cellAt(*grid, r, c).hasCandidate);
@@ -98,8 +98,7 @@ void grid_free(tGrid *grid)
     free(grid->_isRowFree);
 }
 
-bool grid_cell_removeCandidate(tGrid *grid, tIntSize row, tIntSize column, tIntSize candidate)
-{
+bool grid_cell_removeCandidate(tGrid *grid, tIntSize row, tIntSize column, tIntSize candidate) {
     tCell *cell = &grid_cellAt(*grid, row, column);
 
     assert(1 <= candidate && candidate <= grid->SIZE);
@@ -126,8 +125,7 @@ bool grid_cell_removeCandidate(tGrid *grid, tIntSize row, tIntSize column, tIntS
     return possible;
 }
 
-void grid_cell_provideValue(tGrid *grid, tIntSize row, tIntSize column, tIntSize value)
-{
+void grid_cell_provideValue(tGrid *grid, tIntSize row, tIntSize column, tIntSize value) {
     assert(grid_possible(*grid, row, column, value));
 
     tCell *cell = &grid_cellAt(*grid, row, column);
@@ -141,8 +139,7 @@ void grid_cell_provideValue(tGrid *grid, tIntSize row, tIntSize column, tIntSize
     grid_markValueFree(false, *grid, row, column, value);
 }
 
-bool grid_removeCandidateFromRow(tGrid *grid, tIntSize row, tIntSize candidate)
-{
+bool grid_removeCandidateFromRow(tGrid *grid, tIntSize row, tIntSize candidate) {
     bool progress = false;
     for (tIntSize c = 0; c < grid->SIZE; c++) {
         progress |= grid_cell_removeCandidate(grid, row, c, candidate);
@@ -150,8 +147,7 @@ bool grid_removeCandidateFromRow(tGrid *grid, tIntSize row, tIntSize candidate)
     return progress;
 }
 
-bool grid_removeCandidateFromColumn(tGrid *grid, tIntSize column, tIntSize candidate)
-{
+bool grid_removeCandidateFromColumn(tGrid *grid, tIntSize column, tIntSize candidate) {
     bool progress = false;
     for (tIntSize r = 0; r < grid->SIZE; r++) {
         progress |= grid_cell_removeCandidate(grid, r, column, candidate);
@@ -159,8 +155,7 @@ bool grid_removeCandidateFromColumn(tGrid *grid, tIntSize column, tIntSize candi
     return progress;
 }
 
-bool grid_removeCandidateFromBlock(tGrid *grid, tIntSize row, tIntSize column, tIntSize candidate)
-{
+bool grid_removeCandidateFromBlock(tGrid *grid, tIntSize row, tIntSize column, tIntSize candidate) {
     bool progress = false;
 
     tIntSize const blockRow = grid_blockIndex(*grid, row);
@@ -175,8 +170,7 @@ bool grid_removeCandidateFromBlock(tGrid *grid, tIntSize row, tIntSize column, t
     return progress;
 }
 
-void grid_write(tGrid const *grid, FILE *outStream)
-{
+void grid_write(tGrid const *grid, FILE *outStream) {
     for (tIntSize r = 0; r < grid->SIZE; r++) {
         for (tIntSize c = 0; c < grid->SIZE; c++) {
             uint32_t value32 = grid_cellAt(*grid, r, c)._value;
@@ -185,8 +179,7 @@ void grid_write(tGrid const *grid, FILE *outStream)
     }
 }
 
-void grid_print(tGrid const *grid, FILE *outStream)
-{
+void grid_print(tGrid const *grid, FILE *outStream) {
     // Print grid body
     int padding = digitCount(grid->SIZE, 10);
 
@@ -204,8 +197,7 @@ void grid_print(tGrid const *grid, FILE *outStream)
     printBlockSeparationLine(grid, padding, outStream);
 }
 
-void printBlockSeparationLine(tGrid const *grid, int padding, FILE *outStream)
-{
+void printBlockSeparationLine(tGrid const *grid, int padding, FILE *outStream) {
     putc(DISPLAY_INTERSECTION, outStream);
 
     for (tIntSize block = 0; block < grid->N; block++) {
@@ -217,8 +209,7 @@ void printBlockSeparationLine(tGrid const *grid, int padding, FILE *outStream)
     putc('\n', outStream);
 }
 
-void grid_printRow(tGrid const *grid, tIntSize row, int padding, FILE *outStream)
-{
+void grid_printRow(tGrid const *grid, tIntSize row, int padding, FILE *outStream) {
     putc(DISPLAY_VERTICAL_LINE, outStream);
 
     // Print line content
@@ -232,8 +223,7 @@ void grid_printRow(tGrid const *grid, tIntSize row, int padding, FILE *outStream
     putc('\n', outStream);
 }
 
-void printValue(tIntSize value, int padding, FILE *outStream)
-{
+void printValue(tIntSize value, int padding, FILE *outStream) {
     putc(DISPLAY_SPACE, outStream);
 
     if (value == 0) {
@@ -245,8 +235,7 @@ void printValue(tIntSize value, int padding, FILE *outStream)
     putc(DISPLAY_SPACE, outStream);
 }
 
-void printMultipleTimes(char character, unsigned times, FILE *outStream)
-{
+void printMultipleTimes(char character, unsigned times, FILE *outStream) {
     for (unsigned time = 0; time < times; time++) {
         putc(character, outStream);
     }
